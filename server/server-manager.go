@@ -28,6 +28,9 @@ type ServerManager struct {
 	// The server for the Stakewise module
 	stakewiseServer *server.ApiServer
 
+	// The server for the Constellation module
+	constellationServer *server.ApiServer
+
 	// The daemon's main closing waitgroup
 	stopWg *sync.WaitGroup
 }
@@ -70,8 +73,12 @@ func NewServerManager(sp *common.ServiceProvider, cfgPath string, stopWg *sync.W
 		if err != nil {
 			return nil, fmt.Errorf("error starting server for module [%s]: %w", module, err)
 		}
-		mgr.stakewiseServer = server
-
+		if module == "stakewise" {
+			mgr.stakewiseServer = server
+		}
+		if module == "constellation" {
+			mgr.constellationServer = server
+		}
 		fmt.Printf("Daemon started on %s\n", moduleSocketPath)
 	}
 
@@ -90,6 +97,14 @@ func (m *ServerManager) Stop() {
 		err := m.stakewiseServer.Stop()
 		if err != nil {
 			fmt.Printf("WARNING: Stakewise server didn't shutdown cleanly: %s\n", err.Error())
+			m.stopWg.Done()
+		}
+	}
+
+	if m.constellationServer != nil {
+		err := m.constellationServer.Stop()
+		if err != nil {
+			fmt.Printf("WARNING: Constellation server didn't shutdown cleanly: %s\n", err.Error())
 			m.stopWg.Done()
 		}
 	}
