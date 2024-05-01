@@ -10,6 +10,7 @@ const (
 	HyperdriveCliSocketFilename string = HyperdriveDaemonRoute + "-cli.sock"
 	HyperdriveNetSocketFilename string = HyperdriveDaemonRoute + "-net.sock"
 	ConfigFilename              string = "user-settings.yml"
+	DepositDataFile             string = "deposit-data.json"
 
 	// Wallet
 	UserAddressFilename    string = "address"
