@@ -41,6 +41,7 @@ func NewWalletHandler(logger *log.Logger, ctx context.Context, serviceProvider *
 		&walletStatusContextFactory{h},
 		&walletTestRecoverContextFactory{h},
 		&walletTestSearchAndRecoverContextFactory{h},
+		&walletGenerateDepositDataContextFactory{h},
 	}
 	return h
 }
