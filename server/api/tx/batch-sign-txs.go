@@ -92,6 +92,7 @@ func (c *txBatchSignTxsContext) PrepareData(data *api.TxBatchSignTxData, opts *b
 	opts.GasTipCap = c.body.MaxPriorityFee
 	for i, submission := range c.body.Submissions {
 		opts.Nonce = currentNonce
+		fmt.Printf("!!! gasLImit: %d\n", submission.GasLimit)
 		opts.GasLimit = submission.GasLimit
 
 		tx, err := txMgr.SignTransaction(submission.TxInfo, opts)
