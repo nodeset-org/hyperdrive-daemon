@@ -49,6 +49,11 @@ func (c *HyperdriveConfig) BeaconNodeDataVolume() string {
 // === General ===
 // ===============
 
+// Container tag for the daemon
+func (cfg *HyperdriveConfig) GetDaemonContainerTag() string {
+	return cfg.ContainerTag.Value
+}
+
 // Used by text/template to format bn.yml
 func (cfg *HyperdriveConfig) IsLocalMode() bool {
 	return cfg.ClientMode.Value == config.ClientMode_Local
@@ -133,14 +138,6 @@ func (cfg *HyperdriveConfig) AutoTxMaxFeeInt() uint64 {
 
 func (cfg *HyperdriveConfig) AutoTxGasThresholdInt() uint64 {
 	return uint64(cfg.AutoTxGasThreshold.Value)
-}
-
-// ==============
-// === Daemon ===
-// ==============
-
-func (cfg *HyperdriveConfig) GetDaemonContainerTag() string {
-	return hyperdriveTag
 }
 
 // ========================
