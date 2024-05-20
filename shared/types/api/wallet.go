@@ -73,6 +73,12 @@ type WalletGenerateValidatorKeyData struct {
 	PrivateKey []byte `json:"privateKey"`
 }
 
+type WalletGenerateDepositData struct {
+	PublicKey       []byte `json:"publicKey"`
+	Signature       []byte `json:"signature"`
+	DepositDataRoot []byte `json:"depositDataRoot"`
+}
+
 type WalletSendData struct {
 	Balance             *big.Int             `json:"balance"`
 	TokenName           string               `json:"name"`

@@ -186,6 +186,13 @@ func (r *WalletRequester) SignTx(message []byte) (*types.ApiResponse[api.WalletS
 	return client.SendGetRequest[api.WalletSignTxData](r, "sign-tx", "SignTx", args)
 }
 
+func (r *WalletRequester) GenerateDepositData(minipoolAddress common.Address) (*types.ApiResponse[api.WalletGenerateDepositData], error) {
+	args := map[string]string{
+		"address": minipoolAddress.Hex(),
+	}
+	return client.SendGetRequest[api.WalletGenerateDepositData](r, "generate-deposit-data", "GenerateDepositData", args)
+}
+
 // Send tokens from the wallet to an address
 func (r *WalletRequester) Send(amount *big.Int, token string, recipient common.Address) (*types.ApiResponse[api.WalletSendData], error) {
 	args := map[string]string{
