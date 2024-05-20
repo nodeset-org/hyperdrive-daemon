@@ -11,7 +11,6 @@ import (
 	"github.com/nodeset-org/hyperdrive-daemon/shared"
 	"github.com/nodeset-org/hyperdrive-daemon/shared/config/ids"
 	"github.com/nodeset-org/hyperdrive-daemon/shared/config/migration"
-	"github.com/pbnjay/memory"
 	"github.com/rocket-pool/node-manager-core/config"
 	"github.com/rocket-pool/node-manager-core/log"
 	"gopkg.in/yaml.v3"
@@ -29,13 +28,18 @@ const (
 // The master configuration struct
 type HyperdriveConfig struct {
 	// General settings
-	Network            config.Parameter[config.Network]
-	ClientMode         config.Parameter[config.ClientMode]
-	ProjectName        config.Parameter[string]
-	UserDataPath       config.Parameter[string]
-	AutoTxMaxFee       config.Parameter[float64]
-	MaxPriorityFee     config.Parameter[float64]
-	AutoTxGasThreshold config.Parameter[float64]
+	Network                  config.Parameter[config.Network]
+	ClientMode               config.Parameter[config.ClientMode]
+	ProjectName              config.Parameter[string]
+	ApiPort                  config.Parameter[uint16]
+	UserDataPath             config.Parameter[string]
+	AutoTxMaxFee             config.Parameter[float64]
+	MaxPriorityFee           config.Parameter[float64]
+	AutoTxGasThreshold       config.Parameter[float64]
+	AdditionalDockerNetworks config.Parameter[string]
+
+	// The Docker Hub tag for the daemon container
+	ContainerTag config.Parameter[string]
 
 	// Logging
 	Logging *config.LoggerConfig
@@ -110,6 +114,20 @@ func NewHyperdriveConfig(hdDir string) *HyperdriveConfig {
 			},
 			Default: map[config.Network]string{
 				config.Network_All: "hyperdrive",
+			},
+		},
+
+		ApiPort: config.Parameter[uint16]{
+			ParameterCommon: &config.ParameterCommon{
+				ID:                 ids.ApiPortID,
+				Name:               "Daemon API Port",
+				Description:        "The port that Hyperdrive's API server should run on. Note this is bound to the local machine only; it cannot be accessed by other machines.",
+				AffectsContainers:  []config.ContainerID{config.ContainerID_Daemon},
+				CanBeBlank:         false,
+				OverwriteOnUpgrade: false,
+			},
+			Default: map[config.Network]uint16{
+				config.Network_All: DefaultApiPort,
 			},
 		},
 
@@ -211,6 +229,34 @@ func NewHyperdriveConfig(hdDir string) *HyperdriveConfig {
 				config.Network_All: filepath.Join(hdDir, "data"),
 			},
 		},
+
+		AdditionalDockerNetworks: config.Parameter[string]{
+			ParameterCommon: &config.ParameterCommon{
+				ID:                 ids.AdditionalDockerNetworksID,
+				Name:               "Additional Docker Networks",
+				Description:        "List any other externally-managed Docker networks running on this machine that you'd like to give the Hyperdrive services access to here. Use a comma-separated list of network names.\n\nTo get a list of local Docker networks, run `docker network ls`.",
+				AffectsContainers:  []config.ContainerID{config.ContainerID_BeaconNode, config.ContainerID_Daemon, config.ContainerID_ExecutionClient, config.ContainerID_Grafana, config.ContainerID_Prometheus, config.ContainerID_ValidatorClient},
+				CanBeBlank:         true,
+				OverwriteOnUpgrade: false,
+			},
+			Default: map[config.Network]string{
+				config.Network_All: "",
+			},
+		},
+
+		ContainerTag: config.Parameter[string]{
+			ParameterCommon: &config.ParameterCommon{
+				ID:                 ids.ContainerTagID,
+				Name:               "Daemon Container Tag",
+				Description:        "The tag name of the Hyperdrive Daemon image to use.",
+				AffectsContainers:  []config.ContainerID{config.ContainerID_Daemon},
+				CanBeBlank:         false,
+				OverwriteOnUpgrade: true,
+			},
+			Default: map[config.Network]string{
+				config.Network_All: hyperdriveTag,
+			},
+		},
 	}
 
 	// Create the subconfigs
@@ -238,12 +284,15 @@ func (cfg *HyperdriveConfig) GetTitle() string {
 func (cfg *HyperdriveConfig) GetParameters() []config.IParameter {
 	return []config.IParameter{
 		&cfg.ProjectName,
+		&cfg.ApiPort,
 		&cfg.Network,
 		&cfg.ClientMode,
 		&cfg.AutoTxMaxFee,
 		&cfg.MaxPriorityFee,
 		&cfg.AutoTxGasThreshold,
 		&cfg.UserDataPath,
+		&cfg.AdditionalDockerNetworks,
+		&cfg.ContainerTag,
 	}
 }
 
@@ -410,24 +459,6 @@ func getNetworkOptions() []*config.ParameterOption[config.Network] {
 	}
 
 	return options
-}
-
-// Get a more verbose client description, including warnings
-func getAugmentedEcDescription(client config.ExecutionClient, originalDescription string) string {
-	switch client {
-	case config.ExecutionClient_Nethermind:
-		totalMemoryGB := memory.TotalMemory() / 1024 / 1024 / 1024
-		if totalMemoryGB < 9 {
-			return fmt.Sprintf("%s\n\n[red]WARNING: Nethermind currently requires over 8 GB of RAM to run smoothly. We do not recommend it for your system. This may be improved in a future release.", originalDescription)
-		}
-	case config.ExecutionClient_Besu:
-		totalMemoryGB := memory.TotalMemory() / 1024 / 1024 / 1024
-		if totalMemoryGB < 9 {
-			return fmt.Sprintf("%s\n\n[red]WARNING: Besu currently requires over 8 GB of RAM to run smoothly. We do not recommend it for your system. This may be improved in a future release.", originalDescription)
-		}
-	}
-
-	return originalDescription
 }
 
 func (cfg *HyperdriveConfig) updateResources() {

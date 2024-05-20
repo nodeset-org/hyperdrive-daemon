@@ -49,6 +49,11 @@ func (c *HyperdriveConfig) BeaconNodeDataVolume() string {
 // === General ===
 // ===============
 
+// Container tag for the daemon
+func (cfg *HyperdriveConfig) GetDaemonContainerTag() string {
+	return cfg.ContainerTag.Value
+}
+
 // Used by text/template to format bn.yml
 func (cfg *HyperdriveConfig) IsLocalMode() bool {
 	return cfg.ClientMode.Value == config.ClientMode_Local
@@ -135,12 +140,21 @@ func (cfg *HyperdriveConfig) AutoTxGasThresholdInt() uint64 {
 	return uint64(cfg.AutoTxGasThreshold.Value)
 }
 
-// ==============
-// === Daemon ===
-// ==============
+func (cfg *HyperdriveConfig) GetAdditionalDockerNetworks() []string {
+	if len(cfg.AdditionalDockerNetworks.Value) == 0 {
+		return []string{}
+	}
 
-func (cfg *HyperdriveConfig) GetDaemonContainerTag() string {
-	return hyperdriveTag
+	// Trim each element in case the user added spaces
+	networks := []string{}
+	elements := strings.Split(cfg.AdditionalDockerNetworks.Value, ",")
+	for _, element := range elements {
+		trimmed := strings.TrimSpace(element)
+		if len(trimmed) > 0 {
+			networks = append(networks, trimmed)
+		}
+	}
+	return networks
 }
 
 // ========================

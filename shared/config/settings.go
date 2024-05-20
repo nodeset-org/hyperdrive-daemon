@@ -11,6 +11,7 @@ const (
 	HyperdriveNetSocketFilename string = HyperdriveDaemonRoute + "-net.sock"
 	ConfigFilename              string = "user-settings.yml"
 	DepositDataFile             string = "deposit-data.json"
+	DefaultApiPort              uint16 = 8080
 
 	// Wallet
 	UserAddressFilename    string = "address"

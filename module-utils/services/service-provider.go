@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"path/filepath"
+	"net/url"
 	"reflect"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/nodeset-org/hyperdrive-daemon/client"
@@ -43,11 +44,16 @@ type ServiceProvider struct {
 }
 
 // Creates a new ServiceProvider instance
-func NewServiceProvider[ConfigType hdconfig.IModuleConfig](moduleDir string, moduleName string, clientLogName string, factory func(*hdconfig.HyperdriveConfig) ConfigType, clientTimeout time.Duration) (*ServiceProvider, error) {
+func NewServiceProvider[ConfigType hdconfig.IModuleConfig](hyperdriveUrl *url.URL, moduleDir string, moduleName string, clientLogName string, factory func(*hdconfig.HyperdriveConfig) ConfigType, clientTimeout time.Duration) (*ServiceProvider, error) {
+	// Add the API client route if missing
+	hyperdriveUrl.Path = strings.TrimSuffix(hyperdriveUrl.Path, "/")
+	if hyperdriveUrl.Path == "" {
+		hyperdriveUrl.Path = fmt.Sprintf("%s/%s", hyperdriveUrl.Path, hdconfig.HyperdriveApiClientRoute)
+	}
+
 	// Create a client for the Hyperdrive daemon
 	defaultLogger := slog.Default()
-	hyperdriveSocket := filepath.Join(moduleDir, hdconfig.HyperdriveCliSocketFilename)
-	hdClient := client.NewApiClient(hdconfig.HyperdriveApiClientRoute, hyperdriveSocket, defaultLogger)
+	hdClient := client.NewApiClient(hyperdriveUrl, defaultLogger, nil)
 
 	// Get the Hyperdrive config
 	hdCfg := hdconfig.NewHyperdriveConfig("")
@@ -112,7 +118,7 @@ func NewServiceProvider[ConfigType hdconfig.IModuleConfig](moduleDir string, mod
 
 	// Beacon manager
 	primaryBnUrl, fallbackBnUrl := hdCfg.GetBeaconNodeUrls()
-	bcManager, err := services.NewBeaconClientManager(primaryBnUrl, fallbackBnUrl, clientTimeout)
+	bcManager, err := services.NewBeaconClientManager(primaryBnUrl, fallbackBnUrl, resources.ChainID, clientTimeout)
 	if err != nil {
 		return nil, fmt.Errorf("error creating Beacon client manager: %w", err)
 	}

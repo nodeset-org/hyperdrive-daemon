@@ -8,10 +8,10 @@ import (
 )
 
 type UtilsRequester struct {
-	context *client.RequesterContext
+	context client.IRequesterContext
 }
 
-func NewUtilsRequester(context *client.RequesterContext) *UtilsRequester {
+func NewUtilsRequester(context client.IRequesterContext) *UtilsRequester {
 	return &UtilsRequester{
 		context: context,
 	}
@@ -23,7 +23,7 @@ func (r *UtilsRequester) GetName() string {
 func (r *UtilsRequester) GetRoute() string {
 	return "utils"
 }
-func (r *UtilsRequester) GetContext() *client.RequesterContext {
+func (r *UtilsRequester) GetContext() client.IRequesterContext {
 	return r.context
 }
 
@@ -34,9 +34,4 @@ func (r *UtilsRequester) ResolveEns(address common.Address, name string) (*types
 		"name":    name,
 	}
 	return client.SendGetRequest[api.UtilsResolveEnsData](r, "resolve-ens", "ResolveEns", args)
-}
-
-// Get the node's ETH balance
-func (r *UtilsRequester) Balance() (*types.ApiResponse[api.UtilsBalanceData], error) {
-	return client.SendGetRequest[api.UtilsBalanceData](r, "balance", "Balance", nil)
 }

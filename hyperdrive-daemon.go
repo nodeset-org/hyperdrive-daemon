@@ -47,16 +47,23 @@ func main() {
 		Usage:    "The path of the user data directory, which contains the configuration file to load and all of the user's runtime data",
 		Required: true,
 	}
-
-	moduleFlag := &cli.StringSliceFlag{
-		Name:    "module",
-		Aliases: []string{"m"},
-		Usage:   "Provide the name of a module that you want the daemon to create an API socket for. This flag can be specified multiple times, once per module.",
+	ipFlag := &cli.StringFlag{
+		Name:    "ip",
+		Aliases: []string{"i"},
+		Usage:   "The IP address to bind the API server to",
+		Value:   "127.0.0.1",
+	}
+	portFlag := &cli.UintFlag{
+		Name:    "port",
+		Aliases: []string{"p"},
+		Usage:   "The port to bind the API server to",
+		Value:   uint(config.DefaultApiPort),
 	}
 
 	app.Flags = []cli.Flag{
 		userDirFlag,
-		moduleFlag,
+		ipFlag,
+		portFlag,
 	}
 	app.Action = func(c *cli.Context) error {
 		// Get the config file
@@ -79,13 +86,15 @@ func main() {
 
 		// Create the data dir
 		dataDir := sp.GetConfig().UserDataPath.Value
-		err = os.MkdirAll(dataDir, 0700)
+		err = os.MkdirAll(dataDir, 0755)
 		if err != nil {
 			return fmt.Errorf("error creating user data directory [%s]: %w", dataDir, err)
 		}
 
 		// Create the server manager
-		serverMgr, err := server.NewServerManager(sp, cfgPath, stopWg, c.StringSlice(moduleFlag.Name))
+		ip := c.String(ipFlag.Name)
+		port := c.Uint64(portFlag.Name)
+		serverMgr, err := server.NewServerManager(sp, ip, uint16(port), stopWg)
 		if err != nil {
 			return fmt.Errorf("error creating server manager: %w", err)
 		}
@@ -96,8 +105,6 @@ func main() {
 		if err != nil {
 			return fmt.Errorf("error starting task loop: %w", err)
 		}
-
-		// TODO: Metrics manager
 
 		// Handle process closures
 		termListener := make(chan os.Signal, 1)

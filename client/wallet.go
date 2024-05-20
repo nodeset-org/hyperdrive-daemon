@@ -3,6 +3,7 @@ package client
 import (
 	"encoding/hex"
 	"fmt"
+	"math/big"
 	"strconv"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -12,10 +13,10 @@ import (
 )
 
 type WalletRequester struct {
-	context *client.RequesterContext
+	context client.IRequesterContext
 }
 
-func NewWalletRequester(context *client.RequesterContext) *WalletRequester {
+func NewWalletRequester(context client.IRequesterContext) *WalletRequester {
 	return &WalletRequester{
 		context: context,
 	}
@@ -27,7 +28,7 @@ func (r *WalletRequester) GetName() string {
 func (r *WalletRequester) GetRoute() string {
 	return "wallet"
 }
-func (r *WalletRequester) GetContext() *client.RequesterContext {
+func (r *WalletRequester) GetContext() client.IRequesterContext {
 	return r.context
 }
 
@@ -190,4 +191,14 @@ func (r *WalletRequester) GenerateDepositData(minipoolAddress common.Address) (*
 		"address": minipoolAddress.Hex(),
 	}
 	return client.SendGetRequest[api.WalletGenerateDepositData](r, "generate-deposit-data", "GenerateDepositData", args)
+}
+
+// Send tokens from the wallet to an address
+func (r *WalletRequester) Send(amount *big.Int, token string, recipient common.Address) (*types.ApiResponse[api.WalletSendData], error) {
+	args := map[string]string{
+		"amount":    amount.String(),
+		"token":     token,
+		"recipient": recipient.Hex(),
+	}
+	return client.SendGetRequest[api.WalletSendData](r, "send", "Send", args)
 }

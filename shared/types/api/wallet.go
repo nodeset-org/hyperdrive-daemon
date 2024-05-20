@@ -78,3 +78,12 @@ type WalletGenerateDepositData struct {
 	Signature       []byte `json:"signature"`
 	DepositDataRoot []byte `json:"depositDataRoot"`
 }
+
+type WalletSendData struct {
+	Balance             *big.Int             `json:"balance"`
+	TokenName           string               `json:"name"`
+	TokenSymbol         string               `json:"symbol"`
+	CanSend             bool                 `json:"canSend"`
+	InsufficientBalance bool                 `json:"insufficientBalance"`
+	TxInfo              *eth.TransactionInfo `json:"txInfo"`
+}
