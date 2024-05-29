@@ -51,14 +51,14 @@ func (c *serviceClientStatusContext) PrepareData(data *api.ServiceClientStatusDa
 
 	// Get the EC manager status
 	go func() {
-		ecMgrStatus := ec.CheckStatus(ctx, true)
+		ecMgrStatus := ec.CheckStatus(ctx, false)
 		data.EcManagerStatus = *ecMgrStatus
 		wg.Done()
 	}()
 
 	// Get the BC manager status
 	go func() {
-		bcMgrStatus := bc.CheckStatus(ctx, true)
+		bcMgrStatus := bc.CheckStatus(ctx, false)
 		data.BcManagerStatus = *bcMgrStatus
 		wg.Done()
 	}()
