@@ -99,7 +99,7 @@ func (t *TaskLoop) Run() error {
 // Returns true if the owning loop needs to exit, false if it can continue
 func (t *TaskLoop) waitUntilReady() waitUntilReadyResult {
 	// Check the EC status
-	err := t.sp.WaitEthClientSynced(t.ctx, true) // Force refresh the primary / fallback EC status
+	err := t.sp.WaitEthClientSynced(t.ctx, false) // Force refresh the primary / fallback EC status
 	if err != nil {
 		errMsg := err.Error()
 		if strings.Contains(errMsg, "context canceled") {
@@ -116,7 +116,7 @@ func (t *TaskLoop) waitUntilReady() waitUntilReadyResult {
 	}
 
 	// Check the BC status
-	err = t.sp.WaitBeaconClientSynced(t.ctx, true) // Force refresh the primary / fallback BC status
+	err = t.sp.WaitBeaconClientSynced(t.ctx, false) // Force refresh the primary / fallback BC status
 	if err != nil {
 		errMsg := err.Error()
 		if strings.Contains(errMsg, "context canceled") {
