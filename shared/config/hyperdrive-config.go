@@ -167,7 +167,7 @@ func newHyperdriveConfigImpl(hdDir string, network config.Network) *HyperdriveCo
 		EnableIPv6: config.Parameter[bool]{
 			ParameterCommon: &config.ParameterCommon{
 				ID:                 ids.EnableIPv6ID,
-				Name:               "IPv6 Enabled",
+				Name:               "Enable IPv6",
 				Description:        "Enable IPv6 networking for Hyperdrive services. This is useful if you have an IPv6 network and want to use it for Hyperdrive.",
 				AffectsContainers:  []config.ContainerID{config.ContainerID_BeaconNode, config.ContainerID_Daemon, config.ContainerID_ExecutionClient, config.ContainerID_Exporter, config.ContainerID_Grafana, config.ContainerID_Prometheus, config.ContainerID_ValidatorClient},
 				CanBeBlank:         false,
