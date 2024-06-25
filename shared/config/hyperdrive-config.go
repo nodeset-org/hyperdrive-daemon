@@ -30,6 +30,7 @@ type HyperdriveConfig struct {
 	// General settings
 	Network                  config.Parameter[config.Network]
 	ClientMode               config.Parameter[config.ClientMode]
+	IPv6Enabled              config.Parameter[bool]
 	ProjectName              config.Parameter[string]
 	ApiPort                  config.Parameter[uint16]
 	UserDataPath             config.Parameter[string]
@@ -160,6 +161,20 @@ func newHyperdriveConfigImpl(hdDir string, network config.Network) *HyperdriveCo
 			Options: getNetworkOptions(),
 			Default: map[config.Network]config.Network{
 				config.Network_All: config.Network_Mainnet,
+			},
+		},
+
+		IPv6Enabled: config.Parameter[bool]{
+			ParameterCommon: &config.ParameterCommon{
+				ID:                 ids.IPv6EnabledID,
+				Name:               "IPv6 Enabled",
+				Description:        "Enable IPv6 networking for Hyperdrive services. This is useful if you have an IPv6 network and want to use it for Hyperdrive.",
+				AffectsContainers:  []config.ContainerID{config.ContainerID_Daemon, config.ContainerID_ExecutionClient, config.ContainerID_BeaconNode, config.ContainerID_ValidatorClient},
+				CanBeBlank:         false,
+				OverwriteOnUpgrade: false,
+			},
+			Default: map[config.Network]bool{
+				config.Network_All: false,
 			},
 		},
 
@@ -304,6 +319,7 @@ func (cfg *HyperdriveConfig) GetParameters() []config.IParameter {
 		&cfg.ProjectName,
 		&cfg.ApiPort,
 		&cfg.Network,
+		&cfg.IPv6Enabled,
 		&cfg.ClientMode,
 		&cfg.AutoTxMaxFee,
 		&cfg.MaxPriorityFee,
