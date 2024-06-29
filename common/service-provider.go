@@ -40,7 +40,7 @@ func NewServiceProvider(userDir string) (*ServiceProvider, error) {
 // Creates a new ServiceProvider instance directly from a Hyperdrive config instead of loading it from the filesystem
 func NewServiceProviderFromConfig(cfg *hdconfig.HyperdriveConfig) (*ServiceProvider, error) {
 	// Core provider
-	sp, err := services.NewServiceProvider(cfg, hdconfig.ClientTimeout)
+	sp, err := services.NewServiceProvider(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("error creating core service provider: %w", err)
 	}

@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/alessio/shellescape"
 	"github.com/nodeset-org/hyperdrive-daemon/shared"
@@ -546,6 +547,21 @@ func (cfg *HyperdriveConfig) GetExecutionClientUrls() (string, string) {
 	return primaryEcUrl, fallbackEcUrl
 }
 
+func (cfg *HyperdriveConfig) GetExecutionClientTimeouts() config.ClientTimeouts {
+	if cfg.ClientMode.Value == config.ClientMode_Local {
+		return config.ClientTimeouts{
+			FastTimeout:  time.Duration(cfg.LocalExecutionClient.FastTimeout.Value) * time.Second,
+			SlowTimeout:  time.Duration(cfg.LocalExecutionClient.SlowTimeout.Value) * time.Second,
+			RecheckDelay: time.Duration(cfg.Fallback.ReconnectDelay.Value) * time.Second,
+		}
+	}
+	return config.ClientTimeouts{
+		FastTimeout:  time.Duration(cfg.ExternalExecutionClient.FastTimeout.Value) * time.Second,
+		SlowTimeout:  time.Duration(cfg.ExternalExecutionClient.SlowTimeout.Value) * time.Second,
+		RecheckDelay: time.Duration(cfg.Fallback.ReconnectDelay.Value) * time.Second,
+	}
+}
+
 func (cfg *HyperdriveConfig) GetBeaconNodeUrls() (string, string) {
 	primaryBnUrl := cfg.GetBnHttpEndpoint()
 	var fallbackBnUrl string
@@ -553,6 +569,21 @@ func (cfg *HyperdriveConfig) GetBeaconNodeUrls() (string, string) {
 		fallbackBnUrl = cfg.Fallback.BnHttpUrl.Value
 	}
 	return primaryBnUrl, fallbackBnUrl
+}
+
+func (cfg *HyperdriveConfig) GetBeaconNodeTimeouts() config.ClientTimeouts {
+	if cfg.ClientMode.Value == config.ClientMode_Local {
+		return config.ClientTimeouts{
+			FastTimeout:  time.Duration(cfg.LocalBeaconClient.FastTimeout.Value) * time.Second,
+			SlowTimeout:  time.Duration(cfg.LocalBeaconClient.SlowTimeout.Value) * time.Second,
+			RecheckDelay: time.Duration(cfg.Fallback.ReconnectDelay.Value) * time.Second,
+		}
+	}
+	return config.ClientTimeouts{
+		FastTimeout:  time.Duration(cfg.LocalBeaconClient.FastTimeout.Value) * time.Second,
+		SlowTimeout:  time.Duration(cfg.LocalBeaconClient.SlowTimeout.Value) * time.Second,
+		RecheckDelay: time.Duration(cfg.Fallback.ReconnectDelay.Value) * time.Second,
+	}
 }
 
 func (cfg *HyperdriveConfig) GetLoggerOptions() log.LoggerOptions {

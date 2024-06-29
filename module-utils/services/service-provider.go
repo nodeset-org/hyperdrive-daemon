@@ -8,9 +8,7 @@ import (
 	"reflect"
 	"runtime"
 	"strings"
-	"time"
 
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/nodeset-org/hyperdrive-daemon/client"
 	hdconfig "github.com/nodeset-org/hyperdrive-daemon/shared/config"
 	bclient "github.com/rocket-pool/node-manager-core/beacon/client"
@@ -46,7 +44,7 @@ type ServiceProvider struct {
 }
 
 // Creates a new ServiceProvider instance
-func NewServiceProvider[ConfigType hdconfig.IModuleConfig](hyperdriveUrl *url.URL, moduleDir string, moduleName string, clientLogName string, factory func(*hdconfig.HyperdriveConfig) ConfigType, clientTimeout time.Duration) (*ServiceProvider, error) {
+func NewServiceProvider[ConfigType hdconfig.IModuleConfig](hyperdriveUrl *url.URL, moduleDir string, moduleName string, clientLogName string, factory func(*hdconfig.HyperdriveConfig) ConfigType) (*ServiceProvider, error) {
 	hdCfg, hdClient, err := getHdConfig(hyperdriveUrl)
 	if err != nil {
 		return nil, fmt.Errorf("error getting Hyperdrive config: %w", err)
@@ -58,30 +56,32 @@ func NewServiceProvider[ConfigType hdconfig.IModuleConfig](hyperdriveUrl *url.UR
 	// EC Manager
 	var ecManager *services.ExecutionClientManager
 	primaryEcUrl, fallbackEcUrl := hdCfg.GetExecutionClientUrls()
-	primaryEc, err := ethclient.Dial(primaryEcUrl)
+	timeouts := hdCfg.GetExecutionClientTimeouts()
+	primaryEc, err := eth.NewStandardRpcClient(primaryEcUrl, timeouts.FastTimeout, timeouts.SlowTimeout)
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to primary EC at [%s]: %w", primaryEcUrl, err)
 	}
 	if fallbackEcUrl != "" {
 		// Get the fallback EC url, if applicable
-		fallbackEc, err := ethclient.Dial(fallbackEcUrl)
+		fallbackEc, err := eth.NewStandardRpcClient(fallbackEcUrl, timeouts.FastTimeout, timeouts.SlowTimeout)
 		if err != nil {
 			return nil, fmt.Errorf("error connecting to fallback EC at [%s]: %w", fallbackEcUrl, err)
 		}
-		ecManager = services.NewExecutionClientManagerWithFallback(primaryEc, fallbackEc, resources.ChainID, clientTimeout)
+		ecManager = services.NewExecutionClientManagerWithFallback(primaryEc, fallbackEc, resources.ChainID, timeouts.RecheckDelay)
 	} else {
-		ecManager = services.NewExecutionClientManager(primaryEc, resources.ChainID, clientTimeout)
+		ecManager = services.NewExecutionClientManager(primaryEc, resources.ChainID)
 	}
 
 	// Beacon manager
 	var bcManager *services.BeaconClientManager
 	primaryBnUrl, fallbackBnUrl := hdCfg.GetBeaconNodeUrls()
-	primaryBc := bclient.NewStandardHttpClient(primaryBnUrl, clientTimeout)
+	timeouts = hdCfg.GetBeaconNodeTimeouts()
+	primaryBc := bclient.NewStandardHttpClient(primaryBnUrl, timeouts.FastTimeout, timeouts.SlowTimeout)
 	if fallbackBnUrl != "" {
-		fallbackBc := bclient.NewStandardHttpClient(fallbackBnUrl, clientTimeout)
-		bcManager = services.NewBeaconClientManagerWithFallback(primaryBc, fallbackBc, resources.ChainID, clientTimeout)
+		fallbackBc := bclient.NewStandardHttpClient(fallbackBnUrl, timeouts.FastTimeout, timeouts.SlowTimeout)
+		bcManager = services.NewBeaconClientManagerWithFallback(primaryBc, fallbackBc, resources.ChainID, timeouts.RecheckDelay)
 	} else {
-		bcManager = services.NewBeaconClientManager(primaryBc, resources.ChainID, clientTimeout)
+		bcManager = services.NewBeaconClientManager(primaryBc, resources.ChainID)
 	}
 
 	// Get the module config

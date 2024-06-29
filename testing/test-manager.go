@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
-	"time"
 
 	"github.com/nodeset-org/hyperdrive-daemon/client"
 	"github.com/nodeset-org/hyperdrive-daemon/common"
@@ -68,8 +67,8 @@ func NewHyperdriveTestManagerWithDefaults(address string) (*HyperdriveTestManage
 func newHyperdriveTestManagerImpl(address string, tm *osha.TestManager, cfg *hdconfig.HyperdriveConfig, resources *config.NetworkResources) (*HyperdriveTestManager, error) {
 	// Make managers
 	beaconCfg := tm.GetBeaconMockManager().GetConfig()
-	ecManager := services.NewExecutionClientManager(tm.GetExecutionClient(), uint(beaconCfg.ChainID), time.Minute)
-	bnManager := services.NewBeaconClientManager(tm.GetBeaconClient(), uint(beaconCfg.ChainID), time.Minute)
+	ecManager := services.NewExecutionClientManager(tm.GetExecutionClient(), uint(beaconCfg.ChainID))
+	bnManager := services.NewBeaconClientManager(tm.GetBeaconClient(), uint(beaconCfg.ChainID))
 
 	// Make a new service provider
 	serviceProvider, err := common.NewServiceProviderFromCustomServices(
