@@ -550,15 +550,15 @@ func (cfg *HyperdriveConfig) GetExecutionClientUrls() (string, string) {
 func (cfg *HyperdriveConfig) GetExecutionClientTimeouts() config.ClientTimeouts {
 	if cfg.ClientMode.Value == config.ClientMode_Local {
 		return config.ClientTimeouts{
-			FastTimeout:  time.Duration(cfg.LocalExecutionClient.FastTimeout.Value) * time.Second,
-			SlowTimeout:  time.Duration(cfg.LocalExecutionClient.SlowTimeout.Value) * time.Second,
-			RecheckDelay: time.Duration(cfg.Fallback.ReconnectDelay.Value) * time.Second,
+			FastTimeout:  time.Duration(cfg.LocalExecutionClient.FastTimeoutMs.Value) * time.Millisecond,
+			SlowTimeout:  time.Duration(cfg.LocalExecutionClient.SlowTimeoutMs.Value) * time.Millisecond,
+			RecheckDelay: time.Duration(cfg.Fallback.ReconnectDelayMs.Value) * time.Millisecond,
 		}
 	}
 	return config.ClientTimeouts{
-		FastTimeout:  time.Duration(cfg.ExternalExecutionClient.FastTimeout.Value) * time.Second,
-		SlowTimeout:  time.Duration(cfg.ExternalExecutionClient.SlowTimeout.Value) * time.Second,
-		RecheckDelay: time.Duration(cfg.Fallback.ReconnectDelay.Value) * time.Second,
+		FastTimeout:  time.Duration(cfg.ExternalExecutionClient.FastTimeoutMs.Value) * time.Millisecond,
+		SlowTimeout:  time.Duration(cfg.ExternalExecutionClient.SlowTimeoutMs.Value) * time.Millisecond,
+		RecheckDelay: time.Duration(cfg.Fallback.ReconnectDelayMs.Value) * time.Millisecond,
 	}
 }
 
@@ -574,15 +574,15 @@ func (cfg *HyperdriveConfig) GetBeaconNodeUrls() (string, string) {
 func (cfg *HyperdriveConfig) GetBeaconNodeTimeouts() config.ClientTimeouts {
 	if cfg.ClientMode.Value == config.ClientMode_Local {
 		return config.ClientTimeouts{
-			FastTimeout:  time.Duration(cfg.LocalBeaconClient.FastTimeout.Value) * time.Second,
-			SlowTimeout:  time.Duration(cfg.LocalBeaconClient.SlowTimeout.Value) * time.Second,
-			RecheckDelay: time.Duration(cfg.Fallback.ReconnectDelay.Value) * time.Second,
+			FastTimeout:  time.Duration(cfg.LocalBeaconClient.FastTimeoutMs.Value) * time.Millisecond,
+			SlowTimeout:  time.Duration(cfg.LocalBeaconClient.SlowTimeoutMs.Value) * time.Millisecond,
+			RecheckDelay: time.Duration(cfg.Fallback.ReconnectDelayMs.Value) * time.Millisecond,
 		}
 	}
 	return config.ClientTimeouts{
-		FastTimeout:  time.Duration(cfg.LocalBeaconClient.FastTimeout.Value) * time.Second,
-		SlowTimeout:  time.Duration(cfg.LocalBeaconClient.SlowTimeout.Value) * time.Second,
-		RecheckDelay: time.Duration(cfg.Fallback.ReconnectDelay.Value) * time.Second,
+		FastTimeout:  time.Duration(cfg.LocalBeaconClient.FastTimeoutMs.Value) * time.Millisecond,
+		SlowTimeout:  time.Duration(cfg.LocalBeaconClient.SlowTimeoutMs.Value) * time.Millisecond,
+		RecheckDelay: time.Duration(cfg.Fallback.ReconnectDelayMs.Value) * time.Millisecond,
 	}
 }
 

@@ -57,13 +57,17 @@ func NewServiceProvider[ConfigType hdconfig.IModuleConfig](hyperdriveUrl *url.UR
 	var ecManager *services.ExecutionClientManager
 	primaryEcUrl, fallbackEcUrl := hdCfg.GetExecutionClientUrls()
 	timeouts := hdCfg.GetExecutionClientTimeouts()
-	primaryEc, err := eth.NewStandardRpcClient(primaryEcUrl, timeouts.FastTimeout, timeouts.SlowTimeout)
+	ecOpts := &eth.StandardRpcClientOptions{
+		FastTimeout: timeouts.FastTimeout,
+		SlowTimeout: timeouts.SlowTimeout,
+	}
+	primaryEc, err := eth.NewStandardRpcClient(primaryEcUrl, ecOpts)
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to primary EC at [%s]: %w", primaryEcUrl, err)
 	}
 	if fallbackEcUrl != "" {
 		// Get the fallback EC url, if applicable
-		fallbackEc, err := eth.NewStandardRpcClient(fallbackEcUrl, timeouts.FastTimeout, timeouts.SlowTimeout)
+		fallbackEc, err := eth.NewStandardRpcClient(fallbackEcUrl, ecOpts)
 		if err != nil {
 			return nil, fmt.Errorf("error connecting to fallback EC at [%s]: %w", fallbackEcUrl, err)
 		}
@@ -76,9 +80,19 @@ func NewServiceProvider[ConfigType hdconfig.IModuleConfig](hyperdriveUrl *url.UR
 	var bcManager *services.BeaconClientManager
 	primaryBnUrl, fallbackBnUrl := hdCfg.GetBeaconNodeUrls()
 	timeouts = hdCfg.GetBeaconNodeTimeouts()
-	primaryBc := bclient.NewStandardHttpClient(primaryBnUrl, timeouts.FastTimeout, timeouts.SlowTimeout)
+	bnOpts := &bclient.StandardHttpClientOpts{
+		FastTimeout: timeouts.FastTimeout,
+		SlowTimeout: timeouts.SlowTimeout,
+	}
+	primaryBc, err := bclient.NewStandardHttpClient(primaryBnUrl, bnOpts)
+	if err != nil {
+		return nil, fmt.Errorf("error connecting to primary BC at [%s]: %w", primaryBnUrl, err)
+	}
 	if fallbackBnUrl != "" {
-		fallbackBc := bclient.NewStandardHttpClient(fallbackBnUrl, timeouts.FastTimeout, timeouts.SlowTimeout)
+		fallbackBc, err := bclient.NewStandardHttpClient(fallbackBnUrl, bnOpts)
+		if err != nil {
+			return nil, fmt.Errorf("error connecting to fallback BC at [%s]: %w", fallbackBnUrl, err)
+		}
 		bcManager = services.NewBeaconClientManagerWithFallback(primaryBc, fallbackBc, resources.ChainID, timeouts.RecheckDelay)
 	} else {
 		bcManager = services.NewBeaconClientManager(primaryBc, resources.ChainID)
