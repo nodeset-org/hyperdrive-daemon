@@ -3,7 +3,6 @@ package api_test
 import (
 	"testing"
 
-	"github.com/ethereum/go-ethereum/common"
 	hdtesting "github.com/nodeset-org/hyperdrive-daemon/testing"
 	"github.com/stretchr/testify/require"
 )
@@ -16,11 +15,12 @@ func TestGetMinipoolCount(t *testing.T) {
 	}
 	defer wallet_cleanup(snapshotName)
 
-	nsMgr := testMgr.GetNodeSetMockServer().GetManager()
-	response, err := nsMgr.GetAvailableConstellationMinipoolCount(common.HexToAddress("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"))
-
+	// nsMgr := testMgr.GetNodeSetMockServer().GetManager()
+	// response, err := nsMgr.GetAvailableConstellationMinipoolCount(common.HexToAddress("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"))
+	response, err := testMgr.GetApiClient().NodeSet_Constellation.GetAvailableMinipoolCount()
 	require.NoError(t, err)
-	require.Equal(t, 10, response)
+	require.Equal(t, 10, response.Data.Count)
+
 	t.Log("GetAvailableMinipoolCount called")
 
 }
