@@ -64,7 +64,7 @@ func TestGetMinipoolAvailabilityCount(t *testing.T) {
 	// Get the minipool count and assert
 	minipoolCountResponse, err := testMgr.GetApiClient().NodeSet_Constellation.GetAvailableMinipoolCount()
 	require.NoError(t, err)
-	require.Equal(t, 10, minipoolCountResponse.Data.Count)
+	require.Equal(t, expectedMinipoolCount, minipoolCountResponse.Data.Count)
 
 	t.Log("Minipool availability count is correct")
 
