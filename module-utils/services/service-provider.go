@@ -225,7 +225,41 @@ func NewModuleServiceProviderFromArtifacts(hdClient *client.ApiClient, hdCfg *hd
 	signer := NewModuleSigner(hdClient)
 
 	// TX Manager
-	txMgr, err := eth.NewTransactionManager(ecManager, eth.DefaultSafeGasBuffer, eth.DefaultSafeGasMultiplier)
+	var txEndpoint eth.IExecutionClient
+	switch hdCfg.TxEndpointMode.Value {
+	case hdconfig.TxEndpointMode_Client:
+		txEndpoint = ecManager
+	case hdconfig.TxEndpointMode_FlashbotsProtect:
+		url := resources.FlashbotsProtectUrl
+		if url == "" {
+			return nil, fmt.Errorf("Flashbots Protect URL is missing on this network")
+		}
+		txEndpoint, err = ethclient.Dial(url)
+		if err != nil {
+			return nil, fmt.Errorf("error connecting to Flashbots Protect endpoint [%s]: %w", url, err)
+		}
+	case hdconfig.TxEndpointMode_MevBlocker:
+		url := resources.MevBlockerUrl
+		if url == "" {
+			return nil, fmt.Errorf("MEV Blocker URL is missing on this network")
+		}
+		txEndpoint, err = ethclient.Dial(url)
+		if err != nil {
+			return nil, fmt.Errorf("error connecting to MEV Blocker endpoint [%s]: %w", url, err)
+		}
+	case hdconfig.TxEndpointMode_Custom:
+		url := hdCfg.TxCustomRpcUrl.Value
+		if url == "" {
+			return nil, fmt.Errorf("custom TX endpoint URL is missing")
+		}
+		txEndpoint, err = ethclient.Dial(url)
+		if err != nil {
+			return nil, fmt.Errorf("error connecting to custom TX endpoint [%s]: %w", url, err)
+		}
+	default:
+		return nil, fmt.Errorf("unknown TX endpoint mode: %s", hdCfg.TxEndpointMode.Value)
+	}
+	txMgr, err := eth.NewTransactionManager(txEndpoint, eth.DefaultSafeGasBuffer, eth.DefaultSafeGasMultiplier)
 	if err != nil {
 		return nil, fmt.Errorf("error creating transaction manager: %w", err)
 	}

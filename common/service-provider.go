@@ -7,8 +7,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/docker/docker/client"
+	"github.com/ethereum/go-ethereum/ethclient"
 	hdconfig "github.com/nodeset-org/hyperdrive-daemon/shared/config"
+	"github.com/rocket-pool/node-manager-core/eth"
 	"github.com/rocket-pool/node-manager-core/node/services"
 )
 
@@ -124,8 +125,55 @@ func NewHyperdriveServiceProvider(userDir string, resourcesDir string) (IHyperdr
 
 // Creates a new IHyperdriveServiceProvider instance directly from a Hyperdrive config and resources list instead of loading them from the filesystem
 func NewHyperdriveServiceProviderFromConfig(cfg *hdconfig.HyperdriveConfig, resources *hdconfig.MergedResources) (IHyperdriveServiceProvider, error) {
+	// TX Manager
+	var err error
+	var txEndpoint *ethclient.Client
+	switch cfg.TxEndpointMode.Value {
+	case hdconfig.TxEndpointMode_Client:
+		txEndpoint = nil
+	case hdconfig.TxEndpointMode_FlashbotsProtect:
+		url := resources.FlashbotsProtectUrl
+		if url == "" {
+			return nil, fmt.Errorf("Flashbots Protect URL is missing on this network")
+		}
+		txEndpoint, err = ethclient.Dial(url)
+		if err != nil {
+			return nil, fmt.Errorf("error connecting to Flashbots Protect endpoint [%s]: %w", url, err)
+		}
+	case hdconfig.TxEndpointMode_MevBlocker:
+		url := resources.MevBlockerUrl
+		if url == "" {
+			return nil, fmt.Errorf("MEV Blocker URL is missing on this network")
+		}
+		txEndpoint, err = ethclient.Dial(url)
+		if err != nil {
+			return nil, fmt.Errorf("error connecting to MEV Blocker endpoint [%s]: %w", url, err)
+		}
+	case hdconfig.TxEndpointMode_Custom:
+		url := cfg.TxCustomRpcUrl.Value
+		if url == "" {
+			return nil, fmt.Errorf("custom TX endpoint URL is missing")
+		}
+		txEndpoint, err = ethclient.Dial(url)
+		if err != nil {
+			return nil, fmt.Errorf("error connecting to custom TX endpoint [%s]: %w", url, err)
+		}
+	default:
+		return nil, fmt.Errorf("unknown TX endpoint mode: %s", cfg.TxEndpointMode.Value)
+	}
+
+	// Opts
+	opts := services.ServiceProviderOptions{}
+	if txEndpoint != nil {
+		txMgr, err := eth.NewTransactionManager(txEndpoint, eth.DefaultSafeGasBuffer, eth.DefaultSafeGasMultiplier)
+		if err != nil {
+			return nil, fmt.Errorf("error creating transaction manager: %w", err)
+		}
+		opts.TxManager = txMgr
+	}
+
 	// Core provider
-	sp, err := services.NewServiceProvider(cfg, resources.NetworkResources, time.Duration(cfg.ClientTimeout.Value)*time.Second)
+	sp, err := services.NewServiceProvider(cfg, resources.NetworkResources, time.Duration(cfg.ClientTimeout.Value)*time.Second, opts)
 	if err != nil {
 		return nil, fmt.Errorf("error creating core service provider: %w", err)
 	}
@@ -143,9 +191,9 @@ func NewHyperdriveServiceProviderFromConfig(cfg *hdconfig.HyperdriveConfig, reso
 }
 
 // Creates a new IHyperdriveServiceProvider instance from custom services and artifacts
-func NewHyperdriveServiceProviderFromCustomServices(cfg *hdconfig.HyperdriveConfig, resources *hdconfig.MergedResources, ecManager *services.ExecutionClientManager, bnManager *services.BeaconClientManager, docker client.APIClient) (IHyperdriveServiceProvider, error) {
+func NewHyperdriveServiceProviderFromCustomServices(cfg *hdconfig.HyperdriveConfig, resources *hdconfig.MergedResources, opts services.ServiceProviderOptions) (IHyperdriveServiceProvider, error) {
 	// Core provider
-	sp, err := services.NewServiceProviderWithCustomServices(cfg, resources.NetworkResources, ecManager, bnManager, docker)
+	sp, err := services.NewServiceProvider(cfg, resources.NetworkResources, 0, opts)
 	if err != nil {
 		return nil, fmt.Errorf("error creating core service provider: %w", err)
 	}

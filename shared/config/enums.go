@@ -12,9 +12,9 @@ const (
 	Network_LocalTest config.Network = "local-test"
 )
 
+// Enum to identify MEV-boost relays
 type MevRelayID string
 
-// Enum to identify MEV-boost relays
 const (
 	MevRelayID_Unknown            MevRelayID = ""
 	MevRelayID_Flashbots          MevRelayID = "flashbots"
@@ -23,10 +23,20 @@ const (
 	MevRelayID_TitanRegional      MevRelayID = "titanRegional"
 )
 
+// Enum to describe MEV-Boost relay selection mode
 type MevSelectionMode string
 
-// Enum to describe MEV-Boost relay selection mode
 const (
 	MevSelectionMode_All    MevSelectionMode = "all"
 	MevSelectionMode_Manual MevSelectionMode = "manual"
+)
+
+// Enum to describe the transaction endpoint mode
+type TxEndpointMode string
+
+const (
+	TxEndpointMode_Client           TxEndpointMode = "client"
+	TxEndpointMode_FlashbotsProtect TxEndpointMode = "flashbotsProtect"
+	TxEndpointMode_MevBlocker       TxEndpointMode = "mevBlocker"
+	TxEndpointMode_Custom           TxEndpointMode = "custom"
 )

@@ -14,6 +14,7 @@ import (
 	"github.com/nodeset-org/hyperdrive-daemon/shared/auth"
 	"github.com/nodeset-org/hyperdrive-daemon/shared/config"
 	hdconfig "github.com/nodeset-org/hyperdrive-daemon/shared/config"
+	"github.com/rocket-pool/node-manager-core/node/services"
 )
 
 const (
@@ -117,12 +118,15 @@ func (n *HyperdriveNode) CreateSubNode(folder string, address string, port uint1
 	}
 
 	// Make a new service provider
+	opts := services.ServiceProviderOptions{
+		ExecutionClientManager: parentSp.GetEthClient(),
+		BeaconClientManager:    parentSp.GetBeaconClient(),
+		DockerClient:           parentSp.GetDocker(),
+	}
 	sp, err := common.NewHyperdriveServiceProviderFromCustomServices(
 		cfg,
 		parentSp.GetResources(),
-		parentSp.GetEthClient(),
-		parentSp.GetBeaconClient(),
-		parentSp.GetDocker(),
+		opts,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("error creating Hyperdrive service provider: %v", err)

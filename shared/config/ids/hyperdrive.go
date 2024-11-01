@@ -17,6 +17,8 @@ const (
 	AdditionalDockerNetworksID string = "additionalDockerNetworks"
 	ContainerTagID             string = "containerTag"
 	ClientTimeoutID            string = "clientTimeout"
+	TxEndpointModeID           string = "txEndpointMode"
+	TxCustomRpcUrlID           string = "txCustomRpcUrl"
 
 	// Subconfig IDs
 	LoggingID           string = "logging"

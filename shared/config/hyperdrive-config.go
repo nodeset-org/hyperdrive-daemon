@@ -39,6 +39,8 @@ type HyperdriveConfig struct {
 	AutoTxGasThreshold       config.Parameter[float64]
 	AdditionalDockerNetworks config.Parameter[string]
 	ClientTimeout            config.Parameter[uint16]
+	TxCustomRpcUrl           config.Parameter[string]
+	TxEndpointMode           config.Parameter[TxEndpointMode]
 
 	// The Docker Hub tag for the daemon container
 	ContainerTag config.Parameter[string]
@@ -299,6 +301,61 @@ func NewHyperdriveConfigForNetwork(hdDir string, networks []*HyperdriveSettings,
 				config.Network_All: hyperdriveTag,
 			},
 		},
+
+		TxEndpointMode: config.Parameter[TxEndpointMode]{
+			ParameterCommon: &config.ParameterCommon{
+				ID:                 ids.TxEndpointModeID,
+				Name:               "TX Endpoint Type",
+				Description:        "Choose the type of endpoint to use for submitting transactions.",
+				AffectsContainers:  []config.ContainerID{config.ContainerID_Daemon},
+				CanBeBlank:         false,
+				OverwriteOnUpgrade: false,
+			},
+			Options: []*config.ParameterOption[TxEndpointMode]{
+				{
+					ParameterOptionCommon: &config.ParameterOptionCommon{
+						Name:        "Client",
+						Description: "Use the Execution Client you have configured (either locally or externally managed) to submit transactions. If you have a fallback client set up, it will be used as well in case the primary client fails.",
+					},
+					Value: TxEndpointMode_Client,
+				}, {
+					ParameterOptionCommon: &config.ParameterOptionCommon{
+						Name:        "Flashbots Protect",
+						Description: "[orange]NOTE: This is still *EXPERIMENTAL* and may cause undesired effects. Use at your own risk.\n\nSubmit transactions to Flashbots Protect instead of your configured Execution Client. Transactions will go to an off-chain mempool instead of the public Ethereum mempool. This offers revert protection; if a transaction would revert, it will not be included in a block and you will not lose any gas fees. However, transactions will not be viewable on conventional Ethereum chain explorers like Etherscan while pending. They will only appear once they've been included in a block.\n\nFor more info, please see https://docs.flashbots.net/flashbots-protect/overview.",
+					},
+					Value: TxEndpointMode_FlashbotsProtect,
+				}, {
+					ParameterOptionCommon: &config.ParameterOptionCommon{
+						Name:        "MEV-Blocker",
+						Description: "[orange]NOTE: This is still *EXPERIMENTAL* and may cause undesired effects. Use at your own risk.\n\nSubmit transactions to MEV-Blocker instead of your configured Execution Client. Transactions will go to an off-chain mempool instead of the public Ethereum mempool. This is the revert-protected variant; if a transaction would revert, it will not be included in a block and you will not lose any gas fees. However, transactions will not be viewable on conventional Ethereum chain explorers like Etherscan while pending. They will only appear once they've been included in a block.\n\nFor more info, please see https://cow.fi/mev-blocker.",
+					},
+					Value: TxEndpointMode_MevBlocker,
+				}, {
+					ParameterOptionCommon: &config.ParameterOptionCommon{
+						Name:        "Custom",
+						Description: "Submit transactions to a custom RPC endpoint instead of your configured Execution Client and/or Fallback client.\n\nNOTE: If this endpoint is for a private pool, there may be undesired issues with nonce determination and public chain explorers like Etherscan. You should only choose this if you know what you're doing.",
+					},
+					Value: TxEndpointMode_Custom,
+				},
+			},
+			Default: map[config.Network]TxEndpointMode{
+				config.Network_All: TxEndpointMode_Client,
+			},
+		},
+
+		TxCustomRpcUrl: config.Parameter[string]{
+			ParameterCommon: &config.ParameterCommon{
+				ID:                 ids.TxCustomRpcUrlID,
+				Name:               "TX RPC Endpoint",
+				Description:        "By default, Hyperdrive uses the Execution Client you have configured (either locally or externally managed) to submit transactions. If you want to use a different RPC endpoint for submitting transactions, such as Flashbots Protect, enter it here.",
+				AffectsContainers:  []config.ContainerID{config.ContainerID_Daemon},
+				CanBeBlank:         true,
+				OverwriteOnUpgrade: false,
+			},
+			Default: map[config.Network]string{
+				config.Network_All: "",
+			},
+		},
 	}
 
 	// Create the subconfigs
@@ -339,6 +396,8 @@ func (cfg *HyperdriveConfig) GetParameters() []config.IParameter {
 		&cfg.Network,
 		&cfg.EnableIPv6,
 		&cfg.ClientMode,
+		&cfg.TxEndpointMode,
+		&cfg.TxCustomRpcUrl,
 		&cfg.AutoTxMaxFee,
 		&cfg.MaxPriorityFee,
 		&cfg.AutoTxGasThreshold,
