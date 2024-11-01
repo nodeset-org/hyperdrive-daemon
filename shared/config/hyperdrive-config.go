@@ -314,26 +314,26 @@ func NewHyperdriveConfigForNetwork(hdDir string, networks []*HyperdriveSettings,
 			Options: []*config.ParameterOption[TxEndpointMode]{
 				{
 					ParameterOptionCommon: &config.ParameterOptionCommon{
-						Name:        "Client",
+						Name:        "Execution Client",
 						Description: "Use the Execution Client you have configured (either locally or externally managed) to submit transactions. If you have a fallback client set up, it will be used as well in case the primary client fails.",
 					},
 					Value: TxEndpointMode_Client,
 				}, {
 					ParameterOptionCommon: &config.ParameterOptionCommon{
 						Name:        "Flashbots Protect",
-						Description: "[orange]NOTE: This is still *EXPERIMENTAL* and may cause undesired effects. Use at your own risk.\n\nSubmit transactions to Flashbots Protect instead of your configured Execution Client. Transactions will go to an off-chain mempool instead of the public Ethereum mempool. This offers revert protection; if a transaction would revert, it will not be included in a block and you will not lose any gas fees. However, transactions will not be viewable on conventional Ethereum chain explorers like Etherscan while pending. They will only appear once they've been included in a block.\n\nFor more info, please see https://docs.flashbots.net/flashbots-protect/overview.",
+						Description: "Submit transactions to Flashbots Protect instead of your configured Execution Client. Transactions will go to an off-chain mempool instead of the public Ethereum mempool. This offers revert protection; if a transaction would revert, it will not be included in a block and you will not lose any gas fees. However, transactions will not be viewable on conventional Ethereum chain explorers like Etherscan while pending. They will only appear once they've been included in a block.\n\nFor more info, please see https://docs.flashbots.net/flashbots-protect/overview.\n\n[orange]NOTE: This is still *EXPERIMENTAL* and may cause undesired effects. Use at your own risk.",
 					},
 					Value: TxEndpointMode_FlashbotsProtect,
 				}, {
 					ParameterOptionCommon: &config.ParameterOptionCommon{
 						Name:        "MEV-Blocker",
-						Description: "[orange]NOTE: This is still *EXPERIMENTAL* and may cause undesired effects. Use at your own risk.\n\nSubmit transactions to MEV-Blocker instead of your configured Execution Client. Transactions will go to an off-chain mempool instead of the public Ethereum mempool. This is the revert-protected variant; if a transaction would revert, it will not be included in a block and you will not lose any gas fees. However, transactions will not be viewable on conventional Ethereum chain explorers like Etherscan while pending. They will only appear once they've been included in a block.\n\nFor more info, please see https://cow.fi/mev-blocker.",
+						Description: "Submit transactions to MEV-Blocker instead of your configured Execution Client. Transactions will go to an off-chain mempool instead of the public Ethereum mempool. This is the revert-protected variant; if a transaction would revert, it will not be included in a block and you will not lose any gas fees. However, transactions will not be viewable on conventional Ethereum chain explorers like Etherscan while pending. They will only appear once they've been included in a block.\n\nFor more info, please see https://cow.fi/mev-blocker.\n\n[orange]NOTE: This is still *EXPERIMENTAL* and may cause undesired effects. Use at your own risk.",
 					},
 					Value: TxEndpointMode_MevBlocker,
 				}, {
 					ParameterOptionCommon: &config.ParameterOptionCommon{
 						Name:        "Custom",
-						Description: "Submit transactions to a custom RPC endpoint instead of your configured Execution Client and/or Fallback client.\n\nNOTE: If this endpoint is for a private pool, there may be undesired issues with nonce determination and public chain explorers like Etherscan. You should only choose this if you know what you're doing.",
+						Description: "Submit transactions to a custom RPC endpoint instead of your configured Execution Client and/or Fallback client. Selecting this will show the \"Custom TX RPC URL\" box below for you to provide it.\n\nNOTE: If this endpoint is for a private pool, there may be undesired issues with nonce determination and public chain explorers like Etherscan. You should only choose this if you know what you're doing.\n\n[orange]NOTE: This is still *EXPERIMENTAL* and may cause undesired effects. Use at your own risk.",
 					},
 					Value: TxEndpointMode_Custom,
 				},
@@ -346,8 +346,8 @@ func NewHyperdriveConfigForNetwork(hdDir string, networks []*HyperdriveSettings,
 		TxCustomRpcUrl: config.Parameter[string]{
 			ParameterCommon: &config.ParameterCommon{
 				ID:                 ids.TxCustomRpcUrlID,
-				Name:               "TX RPC Endpoint",
-				Description:        "By default, Hyperdrive uses the Execution Client you have configured (either locally or externally managed) to submit transactions. If you want to use a different RPC endpoint for submitting transactions, such as Flashbots Protect, enter it here.",
+				Name:               "Custom TX RPC URL",
+				Description:        "Enter the URL of the custom RPC endpoint you want to use for submitting transactions. This is only used if you've selected the Custom TX Endpoint Type above.",
 				AffectsContainers:  []config.ContainerID{config.ContainerID_Daemon},
 				CanBeBlank:         true,
 				OverwriteOnUpgrade: false,
