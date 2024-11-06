@@ -99,12 +99,15 @@ func newHyperdriveTestManagerImpl(address string, tm *osha.TestManager, cfg *hdc
 	bnManager := services.NewBeaconClientManager(tm.GetBeaconClient(), uint(beaconCfg.ChainID), time.Minute)
 
 	// Make a new service provider
+	opts := services.ServiceProviderOptions{
+		ExecutionClientManager: ecManager,
+		BeaconClientManager:    bnManager,
+		DockerClient:           tm.GetDockerMockManager(),
+	}
 	serviceProvider, err := common.NewHyperdriveServiceProviderFromCustomServices(
 		cfg,
 		resources,
-		ecManager,
-		bnManager,
-		tm.GetDockerMockManager(),
+		opts,
 	)
 	if err != nil {
 		closeTestManager(tm)

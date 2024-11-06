@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/docker/docker/client"
 	hdconfig "github.com/nodeset-org/hyperdrive-daemon/shared/config"
 	"github.com/rocket-pool/node-manager-core/node/services"
 )
@@ -125,7 +124,8 @@ func NewHyperdriveServiceProvider(userDir string, resourcesDir string) (IHyperdr
 // Creates a new IHyperdriveServiceProvider instance directly from a Hyperdrive config and resources list instead of loading them from the filesystem
 func NewHyperdriveServiceProviderFromConfig(cfg *hdconfig.HyperdriveConfig, resources *hdconfig.MergedResources) (IHyperdriveServiceProvider, error) {
 	// Core provider
-	sp, err := services.NewServiceProvider(cfg, resources.NetworkResources, time.Duration(cfg.ClientTimeout.Value)*time.Second)
+	opts := services.ServiceProviderOptions{}
+	sp, err := services.NewServiceProvider(cfg, resources.NetworkResources, time.Duration(cfg.ClientTimeout.Value)*time.Second, opts)
 	if err != nil {
 		return nil, fmt.Errorf("error creating core service provider: %w", err)
 	}
@@ -143,9 +143,9 @@ func NewHyperdriveServiceProviderFromConfig(cfg *hdconfig.HyperdriveConfig, reso
 }
 
 // Creates a new IHyperdriveServiceProvider instance from custom services and artifacts
-func NewHyperdriveServiceProviderFromCustomServices(cfg *hdconfig.HyperdriveConfig, resources *hdconfig.MergedResources, ecManager *services.ExecutionClientManager, bnManager *services.BeaconClientManager, docker client.APIClient) (IHyperdriveServiceProvider, error) {
+func NewHyperdriveServiceProviderFromCustomServices(cfg *hdconfig.HyperdriveConfig, resources *hdconfig.MergedResources, opts services.ServiceProviderOptions) (IHyperdriveServiceProvider, error) {
 	// Core provider
-	sp, err := services.NewServiceProviderWithCustomServices(cfg, resources.NetworkResources, ecManager, bnManager, docker)
+	sp, err := services.NewServiceProvider(cfg, resources.NetworkResources, 0, opts)
 	if err != nil {
 		return nil, fmt.Errorf("error creating core service provider: %w", err)
 	}
