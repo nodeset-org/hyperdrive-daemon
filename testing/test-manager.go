@@ -35,14 +35,14 @@ type HyperdriveTestManager struct {
 	// Map of which services were captured during a snapshot
 	snapshotServiceMap map[string]Service
 
-	// Wait groups for graceful shutdown
+	// Wait group for graceful shutdown
 	nsWg *sync.WaitGroup
 }
 
 // Creates a new HyperdriveTestManager instance. Requires management of your own nodeset.io server mock.
 // `address` is the address to bind the Hyperdrive daemon to.
 func NewHyperdriveTestManager(address string, port uint, cfg *hdconfig.HyperdriveConfig, resources *hdconfig.MergedResources, nsServer *nsserver.NodeSetMockServer) (*HyperdriveTestManager, error) {
-	tm, err := osha.NewTestManager()
+	tm, err := osha.NewTestManager(nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating test manager: %w", err)
 	}
@@ -51,7 +51,7 @@ func NewHyperdriveTestManager(address string, port uint, cfg *hdconfig.Hyperdriv
 
 // Creates a new HyperdriveTestManager instance with default test artifacts.
 func NewHyperdriveTestManagerWithDefaults(netSettingsProvisioner NetworkSettingsProvisioner) (*HyperdriveTestManager, error) {
-	tm, err := osha.NewTestManager()
+	tm, err := osha.NewTestManager(nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating test manager: %w", err)
 	}
