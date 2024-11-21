@@ -35,3 +35,6 @@ build/
 
 # Binaries
 hyperdrive-daemon
+
+# Misc
+.DS_Store

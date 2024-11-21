@@ -46,7 +46,12 @@ func NewHyperdriveTestManager(address string, port uint, cfg *hdconfig.Hyperdriv
 	if err != nil {
 		return nil, fmt.Errorf("error creating test manager: %w", err)
 	}
-	return newHyperdriveTestManagerImpl(address, tm, cfg, resources, nsServer, nil)
+	module, err := newHyperdriveTestManagerImpl(address, tm, cfg, resources, nsServer, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error creating Hyperdrive test manager: %w", err)
+	}
+	tm.RegisterModule(module)
+	return module, nil
 }
 
 // Creates a new HyperdriveTestManager instance with default test artifacts.
@@ -88,7 +93,12 @@ func NewHyperdriveTestManagerWithDefaults(netSettingsProvisioner NetworkSettings
 	cfg.ApiPort.Value = 0
 
 	// Make the test manager
-	return newHyperdriveTestManagerImpl("localhost", tm, cfg, resources, nodesetMock, nsWg)
+	module, err := newHyperdriveTestManagerImpl("localhost", tm, cfg, resources, nodesetMock, nsWg)
+	if err != nil {
+		return nil, fmt.Errorf("error creating Hyperdrive test manager: %w", err)
+	}
+	tm.RegisterModule(module)
+	return module, nil
 }
 
 // Implementation for creating a new HyperdriveTestManager
@@ -136,12 +146,12 @@ func newHyperdriveTestManagerImpl(address string, tm *osha.TestManager, cfg *hdc
 		snapshotServiceMap: map[string]Service{},
 	}
 
-	// Create the baseline snapshot
-	baselineSnapshotID, err := m.takeSnapshot(Service_All)
-	if err != nil {
-		return nil, fmt.Errorf("error creating baseline snapshot: %w", err)
-	}
-	m.baselineSnapshotID = baselineSnapshotID
+	// // Create the baseline snapshot
+	// baselineSnapshotID, err := m.TakeSnapshot()
+	// if err != nil {
+	// 	return nil, fmt.Errorf("error creating baseline snapshot: %w", err)
+	// }
+	// m.baselineSnapshotID = baselineSnapshotID.(string)
 
 	return m, nil
 }
@@ -193,6 +203,10 @@ func (m *HyperdriveTestManager) GetNodeSetMockServer() *nsserver.NodeSetMockServ
 	return m.nodesetMock
 }
 
+func (m *HyperdriveTestManager) GetName() string {
+	return "hyperdrive-daemon"
+}
+
 // ====================
 // === Snapshotting ===
 // ====================
@@ -214,13 +228,13 @@ func (m *HyperdriveTestManager) RevertToBaseline() error {
 }
 
 // Takes a snapshot of the service states
-func (m *HyperdriveTestManager) CreateCustomSnapshot(services Service) (string, error) {
-	return m.takeSnapshot(services)
+func (m *HyperdriveTestManager) CreateCustomSnapshot() (string, error) {
+	return m.TakeSnapshot()
 }
 
 // Revert the services to a snapshot state
 func (m *HyperdriveTestManager) RevertToCustomSnapshot(snapshotID string) error {
-	return m.revertToSnapshot(snapshotID)
+	return m.RevertToSnapshot(snapshotID)
 }
 
 // ==========================
@@ -228,40 +242,24 @@ func (m *HyperdriveTestManager) RevertToCustomSnapshot(snapshotID string) error 
 // ==========================
 
 // Takes a snapshot of the service states
-func (m *HyperdriveTestManager) takeSnapshot(services Service) (string, error) {
-	// Run the parent snapshotter
-	parentServices := osha.Service(services)
-	snapshotName, err := m.TestManager.CreateCustomSnapshot(parentServices)
+func (m *HyperdriveTestManager) TakeSnapshot() (any, error) {
+	snapshotName, err := m.CreateSnapshot()
 	if err != nil {
 		return "", fmt.Errorf("error taking snapshot: %w", err)
 	}
 
-	// Snapshot the nodeset.io mock
-	if services.Contains(Service_NodeSet) {
-		m.nodesetMock.GetManager().TakeSnapshot(snapshotName)
-	}
-
-	// Store the services that were captured
-	m.snapshotServiceMap[snapshotName] = services
 	return snapshotName, nil
 }
 
 // Revert the services to a snapshot state
-func (m *HyperdriveTestManager) revertToSnapshot(snapshotID string) error {
-	services, exists := m.snapshotServiceMap[snapshotID]
-	if !exists {
-		return fmt.Errorf("snapshot with ID [%s] does not exist", snapshotID)
-	}
-
+func (m *HyperdriveTestManager) RevertToSnapshot(snapshotName any) error {
 	// Revert the nodeset.io mock
-	if services.Contains(Service_NodeSet) {
-		err := m.nodesetMock.GetManager().RevertToSnapshot(snapshotID)
-		if err != nil {
-			return fmt.Errorf("error reverting the nodeset.io mock to snapshot %s: %w", snapshotID, err)
-		}
+	err := m.RevertToSnapshot(snapshotName.(string))
+	if err != nil {
+		return fmt.Errorf("error reverting the nodeset.io mock to snapshot %s: %w", snapshotName, err)
 	}
 
-	return m.TestManager.RevertToCustomSnapshot(snapshotID)
+	return nil
 }
 
 // Closes the OSHA test manager, logging any errors
