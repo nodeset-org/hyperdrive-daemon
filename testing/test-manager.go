@@ -146,13 +146,6 @@ func newHyperdriveTestManagerImpl(address string, tm *osha.TestManager, cfg *hdc
 		snapshotServiceMap: map[string]Service{},
 	}
 
-	// // Create the baseline snapshot
-	// baselineSnapshotID, err := m.TakeSnapshot()
-	// if err != nil {
-	// 	return nil, fmt.Errorf("error creating baseline snapshot: %w", err)
-	// }
-	// m.baselineSnapshotID = baselineSnapshotID.(string)
-
 	return m, nil
 }
 
@@ -218,23 +211,17 @@ func (m *HyperdriveTestManager) RevertToBaseline() error {
 		return fmt.Errorf("error reverting to baseline snapshot: %w", err)
 	}
 
-	// Regenerate the baseline snapshot since Hardhat can't revert to it multiple times
-	baselineSnapshotID, err := m.takeSnapshot(Service_All)
-	if err != nil {
-		return fmt.Errorf("error creating baseline snapshot: %w", err)
-	}
-	m.baselineSnapshotID = baselineSnapshotID
 	return nil
 }
 
 // Takes a snapshot of the service states
 func (m *HyperdriveTestManager) CreateCustomSnapshot() (string, error) {
-	return m.TakeSnapshot()
+	return m.CreateSnapshot()
 }
 
 // Revert the services to a snapshot state
-func (m *HyperdriveTestManager) RevertToCustomSnapshot(snapshotID string) error {
-	return m.RevertToSnapshot(snapshotID)
+func (m *HyperdriveTestManager) RevertToCustomSnapshot(snapshotName any) error {
+	return m.RevertToSnapshot(snapshotName)
 }
 
 // ==========================
