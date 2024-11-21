@@ -216,12 +216,12 @@ func (m *HyperdriveTestManager) RevertToBaseline() error {
 
 // Takes a snapshot of the service states
 func (m *HyperdriveTestManager) TakeSnapshot() (any, error) {
-	return m.TestManager.CreateSnapshot()
+	// return m.TestManager.CreateSnapshot()
 }
 
 // Revert the services to a snapshot state
 func (m *HyperdriveTestManager) RevertToSnapshot(snapshotName any) error {
-	return m.TestManager.RevertToSnapshot(snapshotName.(string))
+	// return m.TestManager.RevertToSnapshot(snapshotName.(string))
 }
 
 // ==========================
