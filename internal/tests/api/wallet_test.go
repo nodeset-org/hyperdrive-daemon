@@ -28,11 +28,11 @@ var (
 
 func TestWalletRecover_Success(t *testing.T) {
 	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateCustomSnapshot()
+	snapshotName, err := testMgr.TakeSnapshot()
 	if err != nil {
 		fail("Error creating custom snapshot: %v", err)
 	}
-	defer wallet_cleanup(snapshotName)
+	defer wallet_cleanup(snapshotName.(string))
 
 	// Run the round-trip test
 	derivationPath := string(wallet.DerivationPath_Default)
@@ -48,11 +48,11 @@ func TestWalletRecover_Success(t *testing.T) {
 
 func TestWalletRecover_WrongIndex(t *testing.T) {
 	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateCustomSnapshot()
+	snapshotName, err := testMgr.TakeSnapshot()
 	if err != nil {
 		fail("Error creating custom snapshot: %v", err)
 	}
-	defer wallet_cleanup(snapshotName)
+	defer wallet_cleanup(snapshotName.(string))
 
 	// Run the round-trip test
 	derivationPath := string(wallet.DerivationPath_Default)
@@ -67,11 +67,11 @@ func TestWalletRecover_WrongIndex(t *testing.T) {
 }
 
 func TestWalletRecover_WrongDerivationPath(t *testing.T) {
-	snapshotName, err := testMgr.CreateCustomSnapshot()
+	snapshotName, err := testMgr.TakeSnapshot()
 	if err != nil {
 		fail("Error creating custom snapshot: %v", err)
 	}
-	defer wallet_cleanup(snapshotName)
+	defer wallet_cleanup(snapshotName.(string))
 
 	// Run the round-trip test
 	derivationPath := string(wallet.DerivationPath_LedgerLive)
@@ -104,11 +104,11 @@ func TestWalletStatus_NotLoaded(t *testing.T) {
 
 func TestWalletStatus_Loaded(t *testing.T) {
 	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateCustomSnapshot()
+	snapshotName, err := testMgr.TakeSnapshot()
 	if err != nil {
 		fail("Error creating custom snapshot: %v", err)
 	}
-	defer wallet_cleanup(snapshotName)
+	defer wallet_cleanup(snapshotName.(string))
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
 	// error out because the block is too old and it thinks the client just can't find any peers
@@ -142,11 +142,11 @@ func TestWalletStatus_Loaded(t *testing.T) {
 
 func TestWalletBalance(t *testing.T) {
 	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateCustomSnapshot()
+	snapshotName, err := testMgr.TakeSnapshot()
 	if err != nil {
 		fail("Error creating custom snapshot: %v", err)
 	}
-	defer wallet_cleanup(snapshotName)
+	defer wallet_cleanup(snapshotName.(string))
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
 	// error out because the block is too old and it thinks the client just can't find any peers
@@ -175,11 +175,11 @@ func TestWalletBalance(t *testing.T) {
 
 func TestWalletSignMessage(t *testing.T) {
 	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateCustomSnapshot()
+	snapshotName, err := testMgr.TakeSnapshot()
 	if err != nil {
 		fail("Error creating custom snapshot: %v", err)
 	}
-	defer wallet_cleanup(snapshotName)
+	defer wallet_cleanup(snapshotName.(string))
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
 	// error out because the block is too old and it thinks the client just can't find any peers
@@ -220,11 +220,11 @@ func TestWalletSignMessage(t *testing.T) {
 
 func TestWalletSend_EthSuccess(t *testing.T) {
 	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateCustomSnapshot()
+	snapshotName, err := testMgr.TakeSnapshot()
 	if err != nil {
 		fail("Error creating custom snapshot: %v", err)
 	}
-	defer wallet_cleanup(snapshotName)
+	defer wallet_cleanup(snapshotName.(string))
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
 	// error out because the block is too old and it thinks the client just can't find any peers
@@ -284,11 +284,11 @@ func TestWalletSend_EthSuccess(t *testing.T) {
 
 func TestWalletSend_EthFailure(t *testing.T) {
 	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateCustomSnapshot()
+	snapshotName, err := testMgr.TakeSnapshot()
 	if err != nil {
 		fail("Error creating custom snapshot: %v", err)
 	}
-	defer wallet_cleanup(snapshotName)
+	defer wallet_cleanup(snapshotName.(string))
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
 	// error out because the block is too old and it thinks the client just can't find any peers
@@ -329,7 +329,7 @@ func wallet_cleanup(snapshotName string) {
 	}
 
 	// Revert to the snapshot taken at the start of the test
-	err := testMgr.RevertToCustomSnapshot(snapshotName)
+	err := testMgr.RevertToSnapshot(snapshotName)
 	if err != nil {
 		fail("Error reverting to custom snapshot: %v", err)
 	}

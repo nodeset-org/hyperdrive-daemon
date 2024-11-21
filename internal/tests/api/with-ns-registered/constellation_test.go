@@ -21,11 +21,11 @@ const (
 // Test getting a signature for whitelisting a node
 func TestConstellationWhitelistSignature(t *testing.T) {
 	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateCustomSnapshot()
+	snapshotName, err := testMgr.TakeSnapshot()
 	if err != nil {
 		fail("Error creating custom snapshot: %v", err)
 	}
-	defer nodeset_cleanup(snapshotName)
+	defer nodeset_cleanup(snapshotName.(string))
 
 	// Get the private key for the Constellation deployer (the admin)
 	keygen, err := keys.NewKeyGeneratorWithDefaults()
@@ -67,7 +67,7 @@ func nodeset_cleanup(snapshotName string) {
 
 	// Revert to the snapshot taken at the start of the test
 	if snapshotName != "" {
-		err := testMgr.RevertToCustomSnapshot(snapshotName)
+		err := testMgr.RevertToSnapshot(snapshotName)
 		if err != nil {
 			fail("Error reverting to custom snapshot: %v", err)
 		}

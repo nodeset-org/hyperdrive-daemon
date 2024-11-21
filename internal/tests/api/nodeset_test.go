@@ -17,11 +17,11 @@ const (
 // Test registration with nodeset.io if the node doesn't have a wallet yet
 func TestNodeSetRegistration_NoWallet(t *testing.T) {
 	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateCustomSnapshot()
+	snapshotName, err := testMgr.TakeSnapshot()
 	if err != nil {
 		fail("Error creating custom snapshot: %v", err)
 	}
-	defer nodeset_cleanup(snapshotName)
+	defer nodeset_cleanup(snapshotName.(string))
 
 	// Run the round-trip test
 	hd := hdNode.GetApiClient()
@@ -34,11 +34,11 @@ func TestNodeSetRegistration_NoWallet(t *testing.T) {
 // Test registration with nodeset.io if the node has a wallet but hasn't been registered yet
 func TestNodeSetRegistration_NoRegistration(t *testing.T) {
 	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateCustomSnapshot()
+	snapshotName, err := testMgr.TakeSnapshot()
 	if err != nil {
 		fail("Error creating custom snapshot: %v", err)
 	}
-	defer nodeset_cleanup(snapshotName)
+	defer nodeset_cleanup(snapshotName.(string))
 
 	// Recover a wallet
 	derivationPath := string(wallet.DerivationPath_Default)
@@ -62,11 +62,11 @@ func TestNodeSetRegistration_NoRegistration(t *testing.T) {
 // Test registration with nodeset.io if the node has a wallet and has been registered
 func TestNodeSetRegistration_Registered(t *testing.T) {
 	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateCustomSnapshot()
+	snapshotName, err := testMgr.TakeSnapshot()
 	if err != nil {
 		fail("Error creating custom snapshot: %v", err)
 	}
-	defer nodeset_cleanup(snapshotName)
+	defer nodeset_cleanup(snapshotName.(string))
 
 	// Recover a wallet
 	derivationPath := string(wallet.DerivationPath_Default)
@@ -109,7 +109,7 @@ func nodeset_cleanup(snapshotName string) {
 
 	// Revert to the snapshot taken at the start of the test
 	if snapshotName != "" {
-		err := testMgr.RevertToCustomSnapshot(snapshotName)
+		err := testMgr.RevertToSnapshot(snapshotName)
 		if err != nil {
 			fail("Error reverting to custom snapshot: %v", err)
 		}

@@ -215,39 +215,39 @@ func (m *HyperdriveTestManager) RevertToBaseline() error {
 }
 
 // Takes a snapshot of the service states
-func (m *HyperdriveTestManager) CreateCustomSnapshot() (string, error) {
+func (m *HyperdriveTestManager) TakeSnapshot() (any, error) {
 	return m.CreateSnapshot()
 }
 
 // Revert the services to a snapshot state
-func (m *HyperdriveTestManager) RevertToCustomSnapshot(snapshotName any) error {
-	return m.RevertToSnapshot(snapshotName)
+func (m *HyperdriveTestManager) RevertToSnapshot(snapshotName any) error {
+	return m.RevertToSnapshot(snapshotName.(string))
 }
 
 // ==========================
 // === Internal Functions ===
 // ==========================
 
-// Takes a snapshot of the service states
-func (m *HyperdriveTestManager) TakeSnapshot() (any, error) {
-	snapshotName, err := m.CreateSnapshot()
-	if err != nil {
-		return "", fmt.Errorf("error taking snapshot: %w", err)
-	}
+// // Takes a snapshot of the service states
+// func (m *HyperdriveTestManager) takeSnapshot() (any, error) {
+// 	snapshotName, err := m.CreateSnapshot()
+// 	if err != nil {
+// 		return "", fmt.Errorf("error taking snapshot: %w", err)
+// 	}
 
-	return snapshotName, nil
-}
+// 	return snapshotName, nil
+// }
 
 // Revert the services to a snapshot state
-func (m *HyperdriveTestManager) RevertToSnapshot(snapshotName any) error {
-	// Revert the nodeset.io mock
-	err := m.RevertToSnapshot(snapshotName.(string))
-	if err != nil {
-		return fmt.Errorf("error reverting the nodeset.io mock to snapshot %s: %w", snapshotName, err)
-	}
+// func (m *HyperdriveTestManager) revertToSnapshot(snapshotName any) error {
+// 	// Revert the nodeset.io mock
+// 	err := m.RevertToSnapshot(snapshotName.(string))
+// 	if err != nil {
+// 		return fmt.Errorf("error reverting the nodeset.io mock to snapshot %s: %w", snapshotName, err)
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 // Closes the OSHA test manager, logging any errors
 func closeTestManager(tm *osha.TestManager) {

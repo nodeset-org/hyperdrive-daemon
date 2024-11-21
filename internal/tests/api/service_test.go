@@ -13,11 +13,11 @@ import (
 // Test getting the client status of synced clients
 func TestClientStatus_Synced(t *testing.T) {
 	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateCustomSnapshot()
+	snapshotName, err := testMgr.TakeSnapshot()
 	if err != nil {
 		fail("Error creating custom snapshot: %v", err)
 	}
-	defer service_cleanup(snapshotName)
+	defer service_cleanup(snapshotName.(string))
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
 	// error out because the block is too old and it thinks the client just can't find any peers
@@ -60,11 +60,11 @@ func TestServerVersion(t *testing.T) {
 
 func TestRestartContainer(t *testing.T) {
 	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateCustomSnapshot()
+	snapshotName, err := testMgr.TakeSnapshot()
 	if err != nil {
 		fail("Error creating custom snapshot: %v", err)
 	}
-	defer service_cleanup(snapshotName)
+	defer service_cleanup(snapshotName.(string))
 
 	// Get some services
 	sp := hdNode.GetServiceProvider()
@@ -119,7 +119,7 @@ func service_cleanup(snapshotName string) {
 
 	// Revert to the snapshot taken at the start of the test
 	if snapshotName != "" {
-		err := testMgr.RevertToCustomSnapshot(snapshotName)
+		err := testMgr.RevertToSnapshot(snapshotName)
 		if err != nil {
 			fail("Error reverting to custom snapshot: %v", err)
 		}
