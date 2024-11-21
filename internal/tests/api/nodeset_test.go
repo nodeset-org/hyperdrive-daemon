@@ -18,10 +18,12 @@ const (
 func TestNodeSetRegistration_NoWallet(t *testing.T) {
 	// Take a snapshot, revert at the end
 	snapshotName, err := testMgr.TakeSnapshot()
+	t.Logf("!!!Snapshot created: %s", snapshotName)
 	if err != nil {
 		fail("Error creating custom snapshot: %v", err)
 	}
 	defer nodeset_cleanup(snapshotName.(string))
+	t.Logf("!!!Snapshot done")
 
 	// Run the round-trip test
 	hd := hdNode.GetApiClient()
