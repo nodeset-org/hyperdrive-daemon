@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
-	hdtesting "github.com/nodeset-org/hyperdrive-daemon/testing"
 	"github.com/nodeset-org/osha/keys"
 	"github.com/rocket-pool/node-manager-core/utils"
 	"github.com/stretchr/testify/require"
@@ -22,7 +21,7 @@ const (
 // Test getting a signature for whitelisting a node
 func TestConstellationWhitelistSignature(t *testing.T) {
 	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateCustomSnapshot(hdtesting.Service_EthClients | hdtesting.Service_Filesystem | hdtesting.Service_NodeSet)
+	snapshotName, err := testMgr.CreateCustomSnapshot()
 	if err != nil {
 		fail("Error creating custom snapshot: %v", err)
 	}

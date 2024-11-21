@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/nodeset-org/hyperdrive-daemon/shared/types/api"
-	hdtesting "github.com/nodeset-org/hyperdrive-daemon/testing"
 	"github.com/nodeset-org/osha/keys"
 	"github.com/rocket-pool/node-manager-core/wallet"
 	"github.com/stretchr/testify/require"
@@ -63,7 +62,7 @@ func TestNodeSetRegistration_NoRegistration(t *testing.T) {
 // Test registration with nodeset.io if the node has a wallet and has been registered
 func TestNodeSetRegistration_Registered(t *testing.T) {
 	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateCustomSnapshot(hdtesting.Service_Filesystem | hdtesting.Service_NodeSet)
+	snapshotName, err := testMgr.CreateCustomSnapshot()
 	if err != nil {
 		fail("Error creating custom snapshot: %v", err)
 	}
