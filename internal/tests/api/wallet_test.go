@@ -26,89 +26,44 @@ var (
 	expectedBalance       *big.Int       = eth.EthToWei(expectedBalanceFloat)
 )
 
-func TestWalletRecover_Success(t *testing.T) {
-	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateSnapshot()
+var walletRecoveredSnapshot string
+var baseSnapshot string
+
+func TestWalletRecover_Base(t *testing.T) {
+	var err error
+	baseSnapshot, err = testMgr.CreateSnapshot()
 	if err != nil {
 		fail("Error creating custom snapshot: %v", err)
 	}
-	defer wallet_cleanup(snapshotName)
+}
 
+func TestWalletRecover_Success(t *testing.T) {
 	// Run the round-trip test
 	derivationPath := string(wallet.DerivationPath_Default)
 	index := uint64(0)
 	response, err := hdNode.GetApiClient().Wallet.Recover(&derivationPath, keys.DefaultMnemonic, &index, goodPassword, true)
 	require.NoError(t, err)
 	t.Log("Recover called")
+
+	// Take a snapshot, revert at the end
+	walletRecoveredSnapshot, err = testMgr.CreateSnapshot()
+	if err != nil {
+		fail("Error creating custom snapshot: %v", err)
+	}
+	defer wallet_cleanup(baseSnapshot)
 
 	// Check the response
 	require.Equal(t, expectedWalletAddress, response.Data.AccountAddress)
 	t.Log("Received correct wallet address")
 }
 
-func TestWalletRecover_WrongIndex(t *testing.T) {
-	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateSnapshot()
-	if err != nil {
-		fail("Error creating custom snapshot: %v", err)
-	}
-	defer wallet_cleanup(snapshotName)
-
-	// Run the round-trip test
-	derivationPath := string(wallet.DerivationPath_Default)
-	index := uint64(1)
-	response, err := hdNode.GetApiClient().Wallet.Recover(&derivationPath, keys.DefaultMnemonic, &index, goodPassword, true)
-	require.NoError(t, err)
-	t.Log("Recover called")
-
-	// Check the response
-	require.NotEqual(t, expectedWalletAddress, response.Data.AccountAddress)
-	t.Logf("Wallet address doesn't match as expected (expected %s, got %s)", expectedWalletAddress.Hex(), response.Data.AccountAddress.Hex())
-}
-
-func TestWalletRecover_WrongDerivationPath(t *testing.T) {
-	snapshotName, err := testMgr.CreateSnapshot()
-	if err != nil {
-		fail("Error creating custom snapshot: %v", err)
-	}
-	defer wallet_cleanup(snapshotName)
-
-	// Run the round-trip test
-	derivationPath := string(wallet.DerivationPath_LedgerLive)
-	index := uint64(0)
-	response, err := hdNode.GetApiClient().Wallet.Recover(&derivationPath, keys.DefaultMnemonic, &index, goodPassword, true)
-	require.NoError(t, err)
-	t.Log("Recover called")
-
-	// Check the response
-	require.NotEqual(t, expectedWalletAddress, response.Data.AccountAddress)
-	t.Logf("Wallet address doesn't match as expected (expected %s, got %s)", expectedWalletAddress.Hex(), response.Data.AccountAddress.Hex())
-}
-
-func TestWalletStatus_NotLoaded(t *testing.T) {
-	apiClient := hdNode.GetApiClient()
-	response, err := apiClient.Wallet.Status()
-	require.NoError(t, err)
-	t.Log("Status called")
-
-	require.Equal(t, emptyWalletAddress, response.Data.WalletStatus.Address.NodeAddress)
-	require.False(t, response.Data.WalletStatus.Address.HasAddress)
-
-	require.Equal(t, wallet.WalletType(""), response.Data.WalletStatus.Wallet.Type)
-	require.False(t, response.Data.WalletStatus.Wallet.IsLoaded)
-	require.False(t, response.Data.WalletStatus.Wallet.IsOnDisk)
-	require.Equal(t, emptyWalletAddress, response.Data.WalletStatus.Wallet.WalletAddress)
-
-	t.Log("Received correct wallet status")
-}
-
 func TestWalletStatus_Loaded(t *testing.T) {
-	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateSnapshot()
+	// Recover wallet loaded snapshot, revert at the end
+	err := testMgr.RevertToSnapshot(walletRecoveredSnapshot)
 	if err != nil {
-		fail("Error creating custom snapshot: %v", err)
+		fail("Error reverting to snapshot: %v", err)
 	}
-	defer wallet_cleanup(snapshotName)
+	defer wallet_cleanup(baseSnapshot)
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
 	// error out because the block is too old and it thinks the client just can't find any peers
@@ -117,14 +72,7 @@ func TestWalletStatus_Loaded(t *testing.T) {
 		t.Fatalf("Error committing block: %v", err)
 	}
 
-	// Regen the wallet
-	derivationPath := string(wallet.DerivationPath_Default)
-	index := uint64(0)
 	apiClient := hdNode.GetApiClient()
-	_, err = apiClient.Wallet.Recover(&derivationPath, keys.DefaultMnemonic, &index, goodPassword, true)
-	require.NoError(t, err)
-	t.Log("Recover called")
-
 	response, err := apiClient.Wallet.Status()
 	require.NoError(t, err)
 	t.Log("Status called")
@@ -174,12 +122,12 @@ func TestWalletBalance(t *testing.T) {
 }
 
 func TestWalletSignMessage(t *testing.T) {
-	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateSnapshot()
+	// Recover wallet loaded snapshot, revert at the end
+	err := testMgr.RevertToSnapshot(walletRecoveredSnapshot)
 	if err != nil {
-		fail("Error creating custom snapshot: %v", err)
+		fail("Error reverting to snapshot: %v", err)
 	}
-	defer wallet_cleanup(snapshotName)
+	defer wallet_cleanup(baseSnapshot)
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
 	// error out because the block is too old and it thinks the client just can't find any peers
@@ -188,14 +136,7 @@ func TestWalletSignMessage(t *testing.T) {
 		t.Fatalf("Error committing block: %v", err)
 	}
 
-	// Regen the wallet
 	apiClient := hdNode.GetApiClient()
-	derivationPath := string(wallet.DerivationPath_Default)
-	index := uint64(0)
-	_, err = apiClient.Wallet.Recover(&derivationPath, keys.DefaultMnemonic, &index, goodPassword, true)
-	require.NoError(t, err)
-	t.Log("Recover called")
-
 	message := []byte("hello world")
 	response, err := apiClient.Wallet.SignMessage(message)
 	require.NoError(t, err)
@@ -219,12 +160,12 @@ func TestWalletSignMessage(t *testing.T) {
 }
 
 func TestWalletSend_EthSuccess(t *testing.T) {
-	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateSnapshot()
+	// Recover wallet loaded snapshot, revert at the end
+	err := testMgr.RevertToSnapshot(walletRecoveredSnapshot)
 	if err != nil {
-		fail("Error creating custom snapshot: %v", err)
+		fail("Error reverting to snapshot: %v", err)
 	}
-	defer wallet_cleanup(snapshotName)
+	defer wallet_cleanup(baseSnapshot)
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
 	// error out because the block is too old and it thinks the client just can't find any peers
@@ -233,14 +174,7 @@ func TestWalletSend_EthSuccess(t *testing.T) {
 		t.Fatalf("Error committing block: %v", err)
 	}
 
-	// Regen the wallet
 	apiClient := hdNode.GetApiClient()
-	derivationPath := string(wallet.DerivationPath_Default)
-	index := uint64(0)
-	_, err = apiClient.Wallet.Recover(&derivationPath, keys.DefaultMnemonic, &index, goodPassword, true)
-	require.NoError(t, err)
-	t.Log("Recover called")
-
 	targetAddress := common.HexToAddress("0x95222290dd7278aa3ddd389cc1e1d165cc4bafe5")
 	response, err := apiClient.Wallet.Send(eth.EthToWei(1), "eth", targetAddress)
 	require.NoError(t, err)
@@ -283,12 +217,12 @@ func TestWalletSend_EthSuccess(t *testing.T) {
 }
 
 func TestWalletSend_EthFailure(t *testing.T) {
-	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateSnapshot()
+	// Recover wallet loaded snapshot, revert at the end
+	err := testMgr.RevertToSnapshot(walletRecoveredSnapshot)
 	if err != nil {
-		fail("Error creating custom snapshot: %v", err)
+		fail("Error reverting to snapshot: %v", err)
 	}
-	defer wallet_cleanup(snapshotName)
+	defer wallet_cleanup(baseSnapshot)
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
 	// error out because the block is too old and it thinks the client just can't find any peers
@@ -297,13 +231,7 @@ func TestWalletSend_EthFailure(t *testing.T) {
 		t.Fatalf("Error committing block: %v", err)
 	}
 
-	// Regen the wallet
 	apiClient := hdNode.GetApiClient()
-	derivationPath := string(wallet.DerivationPath_Default)
-	index := uint64(0)
-	_, err = apiClient.Wallet.Recover(&derivationPath, keys.DefaultMnemonic, &index, goodPassword, true)
-	require.NoError(t, err)
-	t.Log("Recover called")
 
 	// Attempt to send too much ETH
 	targetAddress := common.HexToAddress("0x95222290dd7278aa3ddd389cc1e1d165cc4bafe5")
@@ -317,6 +245,55 @@ func TestWalletSend_EthFailure(t *testing.T) {
 	require.True(t, response.Data.InsufficientBalance)
 	t.Logf("Response correctly indicates insufficient balance")
 
+}
+
+func TestWalletRecover_WrongIndex(t *testing.T) {
+	defer wallet_cleanup(baseSnapshot)
+
+	// Run the round-trip test
+	derivationPath := string(wallet.DerivationPath_Default)
+	index := uint64(1)
+	response, err := hdNode.GetApiClient().Wallet.Recover(&derivationPath, keys.DefaultMnemonic, &index, goodPassword, true)
+	require.NoError(t, err)
+	t.Log("Recover called")
+
+	// Check the response
+	require.NotEqual(t, expectedWalletAddress, response.Data.AccountAddress)
+	t.Logf("Wallet address doesn't match as expected (expected %s, got %s)", expectedWalletAddress.Hex(), response.Data.AccountAddress.Hex())
+}
+
+func TestWalletRecover_WrongDerivationPath(t *testing.T) {
+	defer wallet_cleanup(baseSnapshot)
+
+	// Run the round-trip test
+	derivationPath := string(wallet.DerivationPath_LedgerLive)
+	index := uint64(0)
+	response, err := hdNode.GetApiClient().Wallet.Recover(&derivationPath, keys.DefaultMnemonic, &index, goodPassword, true)
+	require.NoError(t, err)
+	t.Log("Recover called")
+
+	// Check the response
+	require.NotEqual(t, expectedWalletAddress, response.Data.AccountAddress)
+	t.Logf("Wallet address doesn't match as expected (expected %s, got %s)", expectedWalletAddress.Hex(), response.Data.AccountAddress.Hex())
+}
+
+func TestWalletStatus_NotLoaded(t *testing.T) {
+	defer wallet_cleanup(baseSnapshot)
+
+	apiClient := hdNode.GetApiClient()
+	response, err := apiClient.Wallet.Status()
+	require.NoError(t, err)
+	t.Log("Status called")
+
+	require.Equal(t, emptyWalletAddress, response.Data.WalletStatus.Address.NodeAddress)
+	require.False(t, response.Data.WalletStatus.Address.HasAddress)
+
+	require.Equal(t, wallet.WalletType(""), response.Data.WalletStatus.Wallet.Type)
+	require.False(t, response.Data.WalletStatus.Wallet.IsLoaded)
+	require.False(t, response.Data.WalletStatus.Wallet.IsOnDisk)
+	require.Equal(t, emptyWalletAddress, response.Data.WalletStatus.Wallet.WalletAddress)
+
+	t.Log("Received correct wallet status")
 }
 
 // Clean up after each test
