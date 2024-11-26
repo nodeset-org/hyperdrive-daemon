@@ -119,7 +119,7 @@ func service_cleanup(snapshotName string) {
 
 	// Revert to the snapshot taken at the start of the test
 	if snapshotName != "" {
-		err := testMgr.TestManager.RevertToSnapshot(snapshotName)
+		err := testMgr.RevertSnapshot(snapshotName)
 		if err != nil {
 			fail("Error reverting to custom snapshot: %v", err)
 		}

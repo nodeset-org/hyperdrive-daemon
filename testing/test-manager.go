@@ -215,14 +215,24 @@ func (m *HyperdriveTestManager) RevertToBaseline() error {
 }
 
 // Takes a snapshot of the service states
-func (m *HyperdriveTestManager) TakeSnapshot() (any, error) {
-	// TODO: Take snapshot of NSMockManager
-	return "", nil
+func (m *HyperdriveTestManager) TakeSnapshot(snapshotName any) (any, error) {
+	m.nodesetMock.GetManager().TakeSnapshot(snapshotName.(string))
+	return snapshotName, nil
 }
 
 // Revert the services to a snapshot state
 func (m *HyperdriveTestManager) RevertToSnapshot(snapshotName any) error {
-	//TODO: Revert snapshot of NSMockManager
+	m.nodesetMock.GetManager().RevertToSnapshot(snapshotName.(string))
+
+	wallet := m.node.sp.GetWallet()
+	err := wallet.Reload(m.GetLogger())
+	if err != nil {
+		return fmt.Errorf("error reloading wallet: %w", err)
+	}
+	addr, _ := wallet.GetAddress()
+	print("!!! Wallet address: ")
+	print(addr.String())
+
 	return nil
 }
 
