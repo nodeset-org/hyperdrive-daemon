@@ -235,31 +235,6 @@ func (m *HyperdriveTestManager) RevertToSnapshot(snapshotName any) error {
 	return nil
 }
 
-// ==========================
-// === Internal Functions ===
-// ==========================
-
-// // Takes a snapshot of the service states
-// func (m *HyperdriveTestManager) takeSnapshot() (any, error) {
-// 	snapshotName, err := m.CreateSnapshot()
-// 	if err != nil {
-// 		return "", fmt.Errorf("error taking snapshot: %w", err)
-// 	}
-
-// 	return snapshotName, nil
-// }
-
-// Revert the services to a snapshot state
-// func (m *HyperdriveTestManager) revertToSnapshot(snapshotName any) error {
-// 	// Revert the nodeset.io mock
-// 	err := m.RevertToSnapshot(snapshotName.(string))
-// 	if err != nil {
-// 		return fmt.Errorf("error reverting the nodeset.io mock to snapshot %s: %w", snapshotName, err)
-// 	}
-
-// 	return nil
-// }
-
 // Closes the OSHA test manager, logging any errors
 func closeTestManager(tm *osha.TestManager) {
 	err := tm.Close()
