@@ -222,17 +222,16 @@ func (m *HyperdriveTestManager) TakeSnapshot(snapshotName any) (any, error) {
 
 // Revert the services to a snapshot state
 func (m *HyperdriveTestManager) RevertToSnapshot(snapshotName any) error {
-	m.nodesetMock.GetManager().RevertToSnapshot(snapshotName.(string))
+	err := m.nodesetMock.GetManager().RevertToSnapshot(snapshotName.(string))
+	if err != nil {
+		return fmt.Errorf("error reverting the nodeset.io mock to snapshot %s: %w", snapshotName, err)
+	}
 
 	wallet := m.node.sp.GetWallet()
-	err := wallet.Reload(m.GetLogger())
+	err = wallet.Reload(m.GetLogger())
 	if err != nil {
 		return fmt.Errorf("error reloading wallet: %w", err)
 	}
-	addr, _ := wallet.GetAddress()
-	print("!!! Wallet address: ")
-	print(addr.String())
-
 	return nil
 }
 
