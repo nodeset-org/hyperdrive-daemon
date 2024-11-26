@@ -264,16 +264,11 @@ func TestWalletStatus_NotLoaded(t *testing.T) {
 }
 
 func TestWalletBalance(t *testing.T) {
-	// Take a snapshot, revert at the end
-	snapshotName, err := testMgr.CreateSnapshot()
-	if err != nil {
-		fail("Error creating custom snapshot: %v", err)
-	}
-	defer wallet_cleanup(snapshotName)
+	defer wallet_cleanup(baseSnapshot)
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
 	// error out because the block is too old and it thinks the client just can't find any peers
-	err = testMgr.CommitBlock()
+	err := testMgr.CommitBlock()
 	if err != nil {
 		t.Fatalf("Error committing block: %v", err)
 	}
