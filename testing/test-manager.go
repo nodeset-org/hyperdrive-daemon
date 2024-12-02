@@ -210,16 +210,6 @@ func (m *HyperdriveTestManager) GetModuleName() string {
 // === Snapshotting ===
 // ====================
 
-// Reverts the services to the baseline snapshot
-func (m *HyperdriveTestManager) RevertToBaseline() error {
-	err := m.TestManager.RevertToBaseline()
-	if err != nil {
-		return fmt.Errorf("error reverting to baseline snapshot: %w", err)
-	}
-
-	return nil
-}
-
 // Takes a snapshot of the service states
 func (m *HyperdriveTestManager) TakeModuleSnapshot(snapshotName any) (any, error) {
 	m.nodesetMock.GetManager().TakeSnapshot(snapshotName.(string))
