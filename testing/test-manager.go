@@ -50,7 +50,10 @@ func NewHyperdriveTestManager(address string, port uint, cfg *hdconfig.Hyperdriv
 	if err != nil {
 		return nil, fmt.Errorf("error creating Hyperdrive test manager: %w", err)
 	}
-	tm.RegisterModule(module)
+	err = tm.RegisterModule(module)
+	if err != nil {
+		return nil, fmt.Errorf("error registering module: %w", err)
+	}
 	return module, nil
 }
 
@@ -97,7 +100,10 @@ func NewHyperdriveTestManagerWithDefaults(netSettingsProvisioner NetworkSettings
 	if err != nil {
 		return nil, fmt.Errorf("error creating Hyperdrive test manager: %w", err)
 	}
-	tm.RegisterModule(module)
+	err = tm.RegisterModule(module)
+	if err != nil {
+		return nil, fmt.Errorf("error registering module: %w", err)
+	}
 	return module, nil
 }
 
