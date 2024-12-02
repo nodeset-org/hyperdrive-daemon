@@ -76,6 +76,7 @@ func TestNodeSetRegistration_Registered(t *testing.T) {
 	// Check the response
 	apiClient := hdNode.GetApiClient()
 	response, err := apiClient.Wallet.Status()
+	require.NoError(t, err)
 	require.Equal(t, expectedWalletAddress, response.Data.WalletStatus.Address.NodeAddress)
 	t.Log("Received correct wallet address")
 
