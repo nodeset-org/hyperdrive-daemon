@@ -150,7 +150,7 @@ func newHyperdriveTestManagerImpl(address string, tm *osha.TestManager, cfg *hdc
 }
 
 // Closes the Hyperdrive test manager, shutting down the daemon
-func (m *HyperdriveTestManager) Close() error {
+func (m *HyperdriveTestManager) CloseModule() error {
 	if m.nodesetMock != nil {
 		// Check if we're managing the service - if so just stop it
 		if m.nsWg != nil {
@@ -196,7 +196,7 @@ func (m *HyperdriveTestManager) GetNodeSetMockServer() *nsserver.NodeSetMockServ
 	return m.nodesetMock
 }
 
-func (m *HyperdriveTestManager) GetName() string {
+func (m *HyperdriveTestManager) GetModuleName() string {
 	return "hyperdrive-daemon"
 }
 
@@ -215,13 +215,13 @@ func (m *HyperdriveTestManager) RevertToBaseline() error {
 }
 
 // Takes a snapshot of the service states
-func (m *HyperdriveTestManager) TakeSnapshot(snapshotName any) (any, error) {
+func (m *HyperdriveTestManager) TakeModuleSnapshot(snapshotName any) (any, error) {
 	m.nodesetMock.GetManager().TakeSnapshot(snapshotName.(string))
 	return snapshotName, nil
 }
 
 // Revert the services to a snapshot state
-func (m *HyperdriveTestManager) RevertToSnapshot(snapshotName any) error {
+func (m *HyperdriveTestManager) RevertModuleToSnapshot(snapshotName any) error {
 	err := m.nodesetMock.GetManager().RevertToSnapshot(snapshotName.(string))
 	if err != nil {
 		return fmt.Errorf("error reverting the nodeset.io mock to snapshot %s: %w", snapshotName, err)
