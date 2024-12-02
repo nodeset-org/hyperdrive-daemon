@@ -26,12 +26,12 @@ var (
 	expectedBalance       *big.Int       = eth.EthToWei(expectedBalanceFloat)
 )
 
-var walletRecoveredSnapshot string
-var baseSnapshot string
+var walletTestWalletRecoveredSnapshot string
+var walletTestBaseSnapshot string
 
 func TestWalletRecover_Base(t *testing.T) {
 	var err error
-	baseSnapshot, err = testMgr.CreateSnapshot()
+	walletTestBaseSnapshot, err = testMgr.CreateSnapshot()
 	if err != nil {
 		fail("Error creating base snapshot: %v", err)
 	}
@@ -46,11 +46,11 @@ func TestWalletRecover_Success(t *testing.T) {
 	t.Log("Recover called")
 
 	// Take a snapshot, revert at the end
-	walletRecoveredSnapshot, err = testMgr.CreateSnapshot()
+	walletTestWalletRecoveredSnapshot, err = testMgr.CreateSnapshot()
 	if err != nil {
 		fail("Error creating custom snapshot: %v", err)
 	}
-	defer wallet_cleanup(baseSnapshot)
+	defer wallet_cleanup(walletTestBaseSnapshot)
 
 	// Check the response
 	require.Equal(t, expectedWalletAddress, response.Data.AccountAddress)
@@ -59,11 +59,11 @@ func TestWalletRecover_Success(t *testing.T) {
 
 func TestWalletStatus_Loaded(t *testing.T) {
 	// Recover wallet loaded snapshot, revert at the end
-	err := testMgr.RevertSnapshot(walletRecoveredSnapshot)
+	err := testMgr.RevertSnapshot(walletTestWalletRecoveredSnapshot)
 	if err != nil {
 		fail("Error reverting to snapshot: %v", err)
 	}
-	defer wallet_cleanup(baseSnapshot)
+	defer wallet_cleanup(walletTestBaseSnapshot)
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
 	// error out because the block is too old and it thinks the client just can't find any peers
@@ -90,11 +90,11 @@ func TestWalletStatus_Loaded(t *testing.T) {
 
 func TestWalletSignMessage(t *testing.T) {
 	// Recover wallet loaded snapshot, revert at the end
-	err := testMgr.RevertSnapshot(walletRecoveredSnapshot)
+	err := testMgr.RevertSnapshot(walletTestWalletRecoveredSnapshot)
 	if err != nil {
 		fail("Error reverting to snapshot: %v", err)
 	}
-	defer wallet_cleanup(baseSnapshot)
+	defer wallet_cleanup(walletTestBaseSnapshot)
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
 	// error out because the block is too old and it thinks the client just can't find any peers
@@ -128,11 +128,11 @@ func TestWalletSignMessage(t *testing.T) {
 
 func TestWalletSend_EthSuccess(t *testing.T) {
 	// Recover wallet loaded snapshot, revert at the end
-	err := testMgr.RevertSnapshot(walletRecoveredSnapshot)
+	err := testMgr.RevertSnapshot(walletTestWalletRecoveredSnapshot)
 	if err != nil {
 		fail("Error reverting to snapshot: %v", err)
 	}
-	defer wallet_cleanup(baseSnapshot)
+	defer wallet_cleanup(walletTestBaseSnapshot)
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
 	// error out because the block is too old and it thinks the client just can't find any peers
@@ -185,11 +185,11 @@ func TestWalletSend_EthSuccess(t *testing.T) {
 
 func TestWalletSend_EthFailure(t *testing.T) {
 	// Recover wallet loaded snapshot, revert at the end
-	err := testMgr.RevertSnapshot(walletRecoveredSnapshot)
+	err := testMgr.RevertSnapshot(walletTestWalletRecoveredSnapshot)
 	if err != nil {
 		fail("Error reverting to snapshot: %v", err)
 	}
-	defer wallet_cleanup(baseSnapshot)
+	defer wallet_cleanup(walletTestBaseSnapshot)
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
 	// error out because the block is too old and it thinks the client just can't find any peers
@@ -215,7 +215,7 @@ func TestWalletSend_EthFailure(t *testing.T) {
 }
 
 func TestWalletRecover_WrongIndex(t *testing.T) {
-	defer wallet_cleanup(baseSnapshot)
+	defer wallet_cleanup(walletTestBaseSnapshot)
 
 	// Run the round-trip test
 	derivationPath := string(wallet.DerivationPath_Default)
@@ -230,7 +230,7 @@ func TestWalletRecover_WrongIndex(t *testing.T) {
 }
 
 func TestWalletRecover_WrongDerivationPath(t *testing.T) {
-	defer wallet_cleanup(baseSnapshot)
+	defer wallet_cleanup(walletTestBaseSnapshot)
 
 	// Run the round-trip test
 	derivationPath := string(wallet.DerivationPath_LedgerLive)
@@ -245,7 +245,7 @@ func TestWalletRecover_WrongDerivationPath(t *testing.T) {
 }
 
 func TestWalletStatus_NotLoaded(t *testing.T) {
-	defer wallet_cleanup(baseSnapshot)
+	defer wallet_cleanup(walletTestBaseSnapshot)
 
 	apiClient := hdNode.GetApiClient()
 	response, err := apiClient.Wallet.Status()
@@ -264,7 +264,7 @@ func TestWalletStatus_NotLoaded(t *testing.T) {
 }
 
 func TestWalletBalance(t *testing.T) {
-	defer wallet_cleanup(baseSnapshot)
+	defer wallet_cleanup(walletTestBaseSnapshot)
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
 	// error out because the block is too old and it thinks the client just can't find any peers
