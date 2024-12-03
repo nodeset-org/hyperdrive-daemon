@@ -211,14 +211,14 @@ func (m *HyperdriveTestManager) GetModuleName() string {
 // ====================
 
 // Takes a snapshot of the service states
-func (m *HyperdriveTestManager) TakeModuleSnapshot(snapshotName any) (any, error) {
-	m.nodesetMock.GetManager().TakeSnapshot(snapshotName.(string))
+func (m *HyperdriveTestManager) TakeModuleSnapshot(snapshotName string) (string, error) {
+	m.nodesetMock.GetManager().TakeSnapshot(snapshotName)
 	return snapshotName, nil
 }
 
 // Revert the services to a snapshot state
-func (m *HyperdriveTestManager) RevertModuleToSnapshot(snapshotName any) error {
-	err := m.nodesetMock.GetManager().RevertToSnapshot(snapshotName.(string))
+func (m *HyperdriveTestManager) RevertModuleToSnapshot(snapshotName string) error {
+	err := m.nodesetMock.GetManager().RevertToSnapshot(snapshotName)
 	if err != nil {
 		return fmt.Errorf("error reverting the nodeset.io mock to snapshot %s: %w", snapshotName, err)
 	}
