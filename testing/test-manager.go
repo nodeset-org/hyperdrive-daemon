@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/nodeset-org/hyperdrive-daemon/common"
 	hdconfig "github.com/nodeset-org/hyperdrive-daemon/shared/config"
 	nsserver "github.com/nodeset-org/nodeset-client-go/server-mock/server"
@@ -211,16 +212,17 @@ func (m *HyperdriveTestManager) GetModuleName() string {
 // ====================
 
 // Takes a snapshot of the service states
-func (m *HyperdriveTestManager) TakeModuleSnapshot(snapshotName string) (string, error) {
+func (m *HyperdriveTestManager) TakeModuleSnapshot() (any, error) {
+	snapshotName := uuid.New().String()
 	m.nodesetMock.GetManager().TakeSnapshot(snapshotName)
 	return snapshotName, nil
 }
 
 // Revert the services to a snapshot state
-func (m *HyperdriveTestManager) RevertModuleToSnapshot(snapshotName string) error {
-	err := m.nodesetMock.GetManager().RevertToSnapshot(snapshotName)
+func (m *HyperdriveTestManager) RevertModuleToSnapshot(moduleState any) error {
+	err := m.nodesetMock.GetManager().RevertToSnapshot(moduleState.(string))
 	if err != nil {
-		return fmt.Errorf("error reverting the nodeset.io mock to snapshot %s: %w", snapshotName, err)
+		return fmt.Errorf("error reverting the nodeset.io mock to snapshot %s: %w", moduleState, err)
 	}
 
 	wallet := m.node.sp.GetWallet()

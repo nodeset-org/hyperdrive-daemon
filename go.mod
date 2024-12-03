@@ -12,10 +12,11 @@ require (
 	github.com/fatih/color v1.17.0
 	github.com/goccy/go-json v0.10.3
 	github.com/golang-jwt/jwt/v4 v4.5.0
+	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
 	github.com/hashicorp/go-version v1.6.0
 	github.com/nodeset-org/nodeset-client-go v1.2.2
-	github.com/nodeset-org/osha v0.3.2-0.20241203155541-adb96d5bb670
+	github.com/nodeset-org/osha v0.3.2-0.20241203185408-1bf83eeab1fd
 	github.com/rocket-pool/batch-query v1.0.0
 	github.com/rocket-pool/node-manager-core v0.5.2-0.20241029172412-6cb22253be3f
 	github.com/stretchr/testify v1.9.0
@@ -77,7 +78,6 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
