@@ -20,6 +20,16 @@ var (
 	hdNode  *hdtesting.HyperdriveNode
 )
 
+var baseSnapshot string
+
+func TestMain_BaseSnapshot(t *testing.T) {
+	var err error
+	baseSnapshot, err = testMgr.CreateSnapshot()
+	if err != nil {
+		fail("Error creating base snapshot: %v", err)
+	}
+}
+
 // Initialize a common server used by all tests
 func TestMain(m *testing.M) {
 	wg = &sync.WaitGroup{}

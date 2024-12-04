@@ -15,19 +15,10 @@ const (
 )
 
 var nodesetTestWalletRecoveredSnapshot string
-var nodesetTestBaseSnapshot string
-
-func TestNodeset_Base(t *testing.T) {
-	var err error
-	nodesetTestBaseSnapshot, err = testMgr.CreateSnapshot()
-	if err != nil {
-		fail("Error creating base snapshot: %v", err)
-	}
-}
 
 // Test registration with nodeset.io if the node doesn't have a wallet yet
 func TestNodeSetRegistration_NoWallet(t *testing.T) {
-	defer nodeset_cleanup(nodesetTestBaseSnapshot, TestNodeset_Base, t)
+	defer nodeset_cleanup(baseSnapshot, TestMain_BaseSnapshot, t)
 
 	// Run the round-trip test
 	hd := hdNode.GetApiClient()
@@ -50,7 +41,7 @@ func TestNodeSetRegistration_NoRegistration(t *testing.T) {
 	if err != nil {
 		fail("Error creating custom snapshot: %v", err)
 	}
-	defer nodeset_cleanup(nodesetTestBaseSnapshot, TestNodeset_Base, t)
+	defer nodeset_cleanup(baseSnapshot, TestMain_BaseSnapshot, t)
 
 	// Check the response
 	require.Equal(t, expectedWalletAddress, recoverResponse.Data.AccountAddress)
@@ -69,7 +60,7 @@ func TestNodeSetRegistration_Registered(t *testing.T) {
 	// Recover wallet loaded snapshot, revert at the end
 	err := testMgr.DependsOn(TestNodeSetRegistration_NoRegistration, &nodesetTestWalletRecoveredSnapshot, t)
 	require.NoError(t, err)
-	defer wallet_cleanup(nodesetTestBaseSnapshot, TestNodeset_Base, t)
+	defer wallet_cleanup(baseSnapshot, TestMain_BaseSnapshot, t)
 
 	// Check the response
 	apiClient := hdNode.GetApiClient()
