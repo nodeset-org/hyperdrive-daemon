@@ -67,8 +67,9 @@ func TestNodeSetRegistration_NoRegistration(t *testing.T) {
 // Test registration with nodeset.io if the node has a wallet and has been registered
 func TestNodeSetRegistration_Registered(t *testing.T) {
 	// Recover wallet loaded snapshot, revert at the end
-	testMgr.DependsOn(TestNodeSetRegistration_NoRegistration, &nodesetTestWalletRecoveredSnapshot, t)
-	defer wallet_cleanup(nodesetTestBaseSnapshot)
+	err := testMgr.DependsOn(TestNodeSetRegistration_NoRegistration, &nodesetTestWalletRecoveredSnapshot, t)
+	require.NoError(t, err)
+	defer wallet_cleanup(nodesetTestBaseSnapshot, TestNodeset_Base, t)
 
 	// Check the response
 	apiClient := hdNode.GetApiClient()
