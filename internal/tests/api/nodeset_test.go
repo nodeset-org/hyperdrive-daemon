@@ -1,7 +1,6 @@
 package api_test
 
 import (
-	"runtime/debug"
 	"testing"
 
 	"github.com/nodeset-org/hyperdrive-daemon/shared/types/api"
@@ -18,7 +17,7 @@ var nodesetTestWalletRecoveredSnapshot string
 
 // Test registration with nodeset.io if the node doesn't have a wallet yet
 func TestNodeSetRegistration_NoWallet(t *testing.T) {
-	defer nodeset_cleanup(t)
+	defer test_cleanup(t)
 
 	// Run the round-trip test
 	hd := hdNode.GetApiClient()
@@ -30,7 +29,7 @@ func TestNodeSetRegistration_NoWallet(t *testing.T) {
 
 // Test registration with nodeset.io if the node has a wallet but hasn't been registered yet
 func TestNodeSetRegistration_NoRegistration(t *testing.T) {
-	defer nodeset_cleanup(t)
+	defer test_cleanup(t)
 
 	// Recover a wallet
 	derivationPath := string(wallet.DerivationPath_Default)
@@ -58,7 +57,7 @@ func TestNodeSetRegistration_NoRegistration(t *testing.T) {
 
 // Test registration with nodeset.io if the node has a wallet and has been registered
 func TestNodeSetRegistration_Registered(t *testing.T) {
-	defer wallet_cleanup(t)
+	defer test_cleanup(t)
 
 	// Recover wallet loaded snapshot, revert at the end
 	err := testMgr.DependsOn(TestNodeSetRegistration_NoRegistration, &nodesetTestWalletRecoveredSnapshot, t)
@@ -70,7 +69,6 @@ func TestNodeSetRegistration_Registered(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, expectedWalletAddress, response.Data.WalletStatus.Address.NodeAddress)
 	t.Log("Received correct wallet address")
-
 	// Register the node with nodeset.io
 	hd := hdNode.GetApiClient()
 	nsMgr := testMgr.GetNodeSetMockServer().GetManager()
@@ -88,25 +86,5 @@ func TestNodeSetRegistration_Registered(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, api.NodeSetRegistrationStatus_Registered, registrationResponse.Data.Status)
 	t.Logf("Node is registered with nodeset.io")
-}
 
-// Cleanup after a unit test
-func nodeset_cleanup(t *testing.T) {
-	// Handle panics
-	r := recover()
-	if r != nil {
-		debug.PrintStack()
-		fail("Recovered from panic: %v", r)
-	}
-	// Revert to the snapshot taken at the start of the test
-	err := testMgr.DependsOn(TestMain_BaseSnapshot, &baseSnapshot, t)
-	if err != nil {
-		fail("Error in cleanup: %v", err)
-	}
-
-	// Reload the wallet to undo any changes made during the test
-	err = hdNode.GetServiceProvider().GetWallet().Reload(testMgr.GetLogger())
-	if err != nil {
-		fail("Error reloading wallet: %v", err)
-	}
 }

@@ -2,7 +2,6 @@ package api_test
 
 import (
 	"math/big"
-	"runtime/debug"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/accounts"
@@ -29,7 +28,7 @@ var (
 var walletTestWalletRecoveredSnapshot string
 
 func TestWalletRecover_Success(t *testing.T) {
-	defer wallet_cleanup(t)
+	defer test_cleanup(t)
 
 	// Run the round-trip test
 	derivationPath := string(wallet.DerivationPath_Default)
@@ -50,7 +49,7 @@ func TestWalletRecover_Success(t *testing.T) {
 }
 
 func TestWalletStatus_Loaded(t *testing.T) {
-	defer wallet_cleanup(t)
+	defer test_cleanup(t)
 
 	// Recover wallet loaded snapshot, revert at the end
 	err := testMgr.DependsOn(TestWalletRecover_Success, &walletTestWalletRecoveredSnapshot, t)
@@ -80,7 +79,7 @@ func TestWalletStatus_Loaded(t *testing.T) {
 }
 
 func TestWalletSignMessage(t *testing.T) {
-	defer wallet_cleanup(t)
+	defer test_cleanup(t)
 
 	// Recover wallet loaded snapshot, revert at the end
 	err := testMgr.DependsOn(TestWalletRecover_Success, &walletTestWalletRecoveredSnapshot, t)
@@ -117,7 +116,7 @@ func TestWalletSignMessage(t *testing.T) {
 }
 
 func TestWalletSend_EthSuccess(t *testing.T) {
-	defer wallet_cleanup(t)
+	defer test_cleanup(t)
 
 	// Recover wallet loaded snapshot, revert at the end
 	err := testMgr.DependsOn(TestWalletRecover_Success, &walletTestWalletRecoveredSnapshot, t)
@@ -173,7 +172,7 @@ func TestWalletSend_EthSuccess(t *testing.T) {
 }
 
 func TestWalletSend_EthFailure(t *testing.T) {
-	defer wallet_cleanup(t)
+	defer test_cleanup(t)
 
 	// Recover wallet loaded snapshot, revert at the end
 	err := testMgr.DependsOn(TestWalletRecover_Success, &walletTestWalletRecoveredSnapshot, t)
@@ -203,7 +202,7 @@ func TestWalletSend_EthFailure(t *testing.T) {
 }
 
 func TestWalletRecover_WrongIndex(t *testing.T) {
-	defer wallet_cleanup(t)
+	defer test_cleanup(t)
 
 	// Run the round-trip test
 	derivationPath := string(wallet.DerivationPath_Default)
@@ -218,7 +217,7 @@ func TestWalletRecover_WrongIndex(t *testing.T) {
 }
 
 func TestWalletRecover_WrongDerivationPath(t *testing.T) {
-	defer wallet_cleanup(t)
+	defer test_cleanup(t)
 
 	// Run the round-trip test
 	derivationPath := string(wallet.DerivationPath_LedgerLive)
@@ -233,7 +232,7 @@ func TestWalletRecover_WrongDerivationPath(t *testing.T) {
 }
 
 func TestWalletStatus_NotLoaded(t *testing.T) {
-	defer wallet_cleanup(t)
+	defer test_cleanup(t)
 
 	apiClient := hdNode.GetApiClient()
 	response, err := apiClient.Wallet.Status()
@@ -252,7 +251,7 @@ func TestWalletStatus_NotLoaded(t *testing.T) {
 }
 
 func TestWalletBalance(t *testing.T) {
-	defer wallet_cleanup(t)
+	defer test_cleanup(t)
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
 	// error out because the block is too old and it thinks the client just can't find any peers
@@ -277,26 +276,4 @@ func TestWalletBalance(t *testing.T) {
 	// Check the response
 	require.Equal(t, expectedBalance, response.Data.Balance)
 	t.Logf("Received correct balance (%s)", response.Data.Balance.String())
-}
-
-// Clean up after each test
-func wallet_cleanup(t *testing.T) {
-	// Handle panics
-	r := recover()
-	if r != nil {
-		debug.PrintStack()
-		fail("Recovered from panic: %v", r)
-	}
-
-	// Revert to the snapshot taken at the start of the test
-	err := testMgr.DependsOn(TestMain_BaseSnapshot, &baseSnapshot, t)
-	if err != nil {
-		fail("Error reverting to custom snapshot: %v", err)
-	}
-
-	// Reload the wallet to undo any changes made during the test
-	err = hdNode.GetServiceProvider().GetWallet().Reload(testMgr.GetLogger())
-	if err != nil {
-		fail("Error reloading wallet: %v", err)
-	}
 }
