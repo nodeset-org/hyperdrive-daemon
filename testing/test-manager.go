@@ -55,6 +55,11 @@ func NewHyperdriveTestManager(address string, port uint, cfg *hdconfig.Hyperdriv
 	if err != nil {
 		return nil, fmt.Errorf("error registering module: %w", err)
 	}
+	baselineSnapshot, err := tm.CreateSnapshot()
+	if err != nil {
+		return nil, fmt.Errorf("error creating baseline snapshot: %w", err)
+	}
+	module.baselineSnapshotID = baselineSnapshot
 	return module, nil
 }
 
