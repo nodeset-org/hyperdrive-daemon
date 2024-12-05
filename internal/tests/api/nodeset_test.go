@@ -18,7 +18,7 @@ var nodesetTestWalletRecoveredSnapshot string
 
 // Test registration with nodeset.io if the node doesn't have a wallet yet
 func TestNodeSetRegistration_NoWallet(t *testing.T) {
-	defer nodeset_cleanup(baseSnapshot, TestMain_BaseSnapshot, t)
+	defer nodeset_cleanup(t)
 
 	// Run the round-trip test
 	hd := hdNode.GetApiClient()
@@ -30,6 +30,8 @@ func TestNodeSetRegistration_NoWallet(t *testing.T) {
 
 // Test registration with nodeset.io if the node has a wallet but hasn't been registered yet
 func TestNodeSetRegistration_NoRegistration(t *testing.T) {
+	defer nodeset_cleanup(t)
+
 	// Recover a wallet
 	derivationPath := string(wallet.DerivationPath_Default)
 	index := uint64(0)
@@ -41,7 +43,6 @@ func TestNodeSetRegistration_NoRegistration(t *testing.T) {
 	if err != nil {
 		fail("Error creating custom snapshot: %v", err)
 	}
-	defer nodeset_cleanup(baseSnapshot, TestMain_BaseSnapshot, t)
 
 	// Check the response
 	require.Equal(t, expectedWalletAddress, recoverResponse.Data.AccountAddress)
@@ -57,10 +58,11 @@ func TestNodeSetRegistration_NoRegistration(t *testing.T) {
 
 // Test registration with nodeset.io if the node has a wallet and has been registered
 func TestNodeSetRegistration_Registered(t *testing.T) {
+	defer wallet_cleanup(t)
+
 	// Recover wallet loaded snapshot, revert at the end
 	err := testMgr.DependsOn(TestNodeSetRegistration_NoRegistration, &nodesetTestWalletRecoveredSnapshot, t)
 	require.NoError(t, err)
-	defer wallet_cleanup(baseSnapshot, TestMain_BaseSnapshot, t)
 
 	// Check the response
 	apiClient := hdNode.GetApiClient()
@@ -89,7 +91,7 @@ func TestNodeSetRegistration_Registered(t *testing.T) {
 }
 
 // Cleanup after a unit test
-func nodeset_cleanup(snapshotName string, dependency func(*testing.T), t *testing.T) {
+func nodeset_cleanup(t *testing.T) {
 	// Handle panics
 	r := recover()
 	if r != nil {
@@ -97,7 +99,7 @@ func nodeset_cleanup(snapshotName string, dependency func(*testing.T), t *testin
 		fail("Recovered from panic: %v", r)
 	}
 	// Revert to the snapshot taken at the start of the test
-	err := testMgr.DependsOn(dependency, &snapshotName, t)
+	err := testMgr.DependsOn(TestMain_BaseSnapshot, &baseSnapshot, t)
 	if err != nil {
 		fail("Error in cleanup: %v", err)
 	}
