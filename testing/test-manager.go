@@ -102,6 +102,9 @@ func NewHyperdriveTestManagerWithDefaults(netSettingsProvisioner NetworkSettings
 		return nil, fmt.Errorf("error creating Hyperdrive test manager: %w", err)
 	}
 	err = tm.RegisterModule(module)
+	baselineSnapshot, err := tm.CreateSnapshot()
+	module.baselineSnapshotID = baselineSnapshot
+
 	if err != nil {
 		return nil, fmt.Errorf("error registering module: %w", err)
 	}
@@ -210,6 +213,15 @@ func (m *HyperdriveTestManager) GetModuleName() string {
 // ====================
 // === Snapshotting ===
 // ====================
+
+// Takes a snapshot of the service states
+func (m *HyperdriveTestManager) DependsOnBaseline() error {
+	err := m.RevertSnapshot(m.baselineSnapshotID)
+	if err != nil {
+		return fmt.Errorf("error reverting to baseline snapshot %s: %w", m.baselineSnapshotID, err)
+	}
+	return nil
+}
 
 // Takes a snapshot of the service states
 func (m *HyperdriveTestManager) TakeModuleSnapshot() (any, error) {
