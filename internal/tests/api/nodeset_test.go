@@ -17,7 +17,7 @@ var nodesetTestWalletRecoveredSnapshot string
 
 // Test registration with nodeset.io if the node doesn't have a wallet yet
 func TestNodeSetRegistration_NoWallet(t *testing.T) {
-	defer test_cleanup(t)
+	testMgr.RevertSnapshot(baseSnapshot)
 
 	// Run the round-trip test
 	hd := hdNode.GetApiClient()
@@ -29,7 +29,7 @@ func TestNodeSetRegistration_NoWallet(t *testing.T) {
 
 // Test registration with nodeset.io if the node has a wallet but hasn't been registered yet
 func TestNodeSetRegistration_NoRegistration(t *testing.T) {
-	defer test_cleanup(t)
+	testMgr.RevertSnapshot(baseSnapshot)
 
 	// Recover a wallet
 	derivationPath := string(wallet.DerivationPath_Default)
@@ -57,8 +57,6 @@ func TestNodeSetRegistration_NoRegistration(t *testing.T) {
 
 // Test registration with nodeset.io if the node has a wallet and has been registered
 func TestNodeSetRegistration_Registered(t *testing.T) {
-	defer test_cleanup(t)
-
 	// Recover wallet loaded snapshot, revert at the end
 	err := testMgr.DependsOn(TestNodeSetRegistration_NoRegistration, &nodesetTestWalletRecoveredSnapshot, t)
 	require.NoError(t, err)

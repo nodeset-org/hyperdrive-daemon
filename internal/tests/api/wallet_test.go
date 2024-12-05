@@ -28,7 +28,7 @@ var (
 var walletTestWalletRecoveredSnapshot string
 
 func TestWalletRecover_Success(t *testing.T) {
-	defer test_cleanup(t)
+	testMgr.RevertSnapshot(baseSnapshot)
 
 	// Run the round-trip test
 	derivationPath := string(wallet.DerivationPath_Default)
@@ -49,8 +49,6 @@ func TestWalletRecover_Success(t *testing.T) {
 }
 
 func TestWalletStatus_Loaded(t *testing.T) {
-	defer test_cleanup(t)
-
 	// Recover wallet loaded snapshot, revert at the end
 	err := testMgr.DependsOn(TestWalletRecover_Success, &walletTestWalletRecoveredSnapshot, t)
 	require.NoError(t, err)
@@ -79,8 +77,6 @@ func TestWalletStatus_Loaded(t *testing.T) {
 }
 
 func TestWalletSignMessage(t *testing.T) {
-	defer test_cleanup(t)
-
 	// Recover wallet loaded snapshot, revert at the end
 	err := testMgr.DependsOn(TestWalletRecover_Success, &walletTestWalletRecoveredSnapshot, t)
 	require.NoError(t, err)
@@ -116,8 +112,6 @@ func TestWalletSignMessage(t *testing.T) {
 }
 
 func TestWalletSend_EthSuccess(t *testing.T) {
-	defer test_cleanup(t)
-
 	// Recover wallet loaded snapshot, revert at the end
 	err := testMgr.DependsOn(TestWalletRecover_Success, &walletTestWalletRecoveredSnapshot, t)
 	require.NoError(t, err)
@@ -172,8 +166,6 @@ func TestWalletSend_EthSuccess(t *testing.T) {
 }
 
 func TestWalletSend_EthFailure(t *testing.T) {
-	defer test_cleanup(t)
-
 	// Recover wallet loaded snapshot, revert at the end
 	err := testMgr.DependsOn(TestWalletRecover_Success, &walletTestWalletRecoveredSnapshot, t)
 	require.NoError(t, err)
@@ -202,7 +194,7 @@ func TestWalletSend_EthFailure(t *testing.T) {
 }
 
 func TestWalletRecover_WrongIndex(t *testing.T) {
-	defer test_cleanup(t)
+	testMgr.RevertSnapshot(baseSnapshot)
 
 	// Run the round-trip test
 	derivationPath := string(wallet.DerivationPath_Default)
@@ -217,7 +209,7 @@ func TestWalletRecover_WrongIndex(t *testing.T) {
 }
 
 func TestWalletRecover_WrongDerivationPath(t *testing.T) {
-	defer test_cleanup(t)
+	testMgr.RevertSnapshot(baseSnapshot)
 
 	// Run the round-trip test
 	derivationPath := string(wallet.DerivationPath_LedgerLive)
@@ -232,7 +224,7 @@ func TestWalletRecover_WrongDerivationPath(t *testing.T) {
 }
 
 func TestWalletStatus_NotLoaded(t *testing.T) {
-	defer test_cleanup(t)
+	testMgr.RevertSnapshot(baseSnapshot)
 
 	apiClient := hdNode.GetApiClient()
 	response, err := apiClient.Wallet.Status()
@@ -251,7 +243,7 @@ func TestWalletStatus_NotLoaded(t *testing.T) {
 }
 
 func TestWalletBalance(t *testing.T) {
-	defer test_cleanup(t)
+	testMgr.RevertSnapshot(baseSnapshot)
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
 	// error out because the block is too old and it thinks the client just can't find any peers
