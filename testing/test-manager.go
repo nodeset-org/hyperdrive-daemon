@@ -51,10 +51,10 @@ func NewHyperdriveTestManager(address string, port uint, cfg *hdconfig.Hyperdriv
 	if err != nil {
 		return nil, fmt.Errorf("error creating Hyperdrive test manager: %w", err)
 	}
-	err = tm.RegisterModule(module)
-	if err != nil {
-		return nil, fmt.Errorf("error registering module: %w", err)
-	}
+	// Register the module
+	tm.RegisterModule(module)
+
+	// Take a baseline snapshot
 	baselineSnapshot, err := tm.CreateSnapshot()
 	if err != nil {
 		return nil, fmt.Errorf("error creating baseline snapshot: %w", err)
