@@ -106,10 +106,7 @@ func NewHyperdriveTestManagerWithDefaults(netSettingsProvisioner NetworkSettings
 	if err != nil {
 		return nil, fmt.Errorf("error creating Hyperdrive test manager: %w", err)
 	}
-	err = tm.RegisterModule(module)
-	if err != nil {
-		return nil, fmt.Errorf("error registering module: %w", err)
-	}
+	tm.RegisterModule(module)
 	baselineSnapshot, err := tm.CreateSnapshot()
 	if err != nil {
 		return nil, fmt.Errorf("error creating baseline snapshot: %w", err)
