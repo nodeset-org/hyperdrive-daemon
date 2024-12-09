@@ -30,6 +30,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		fail("error creating test manager: %v", err)
 	}
+
 	logger = testMgr.GetLogger()
 	hdNode = testMgr.GetNode()
 
