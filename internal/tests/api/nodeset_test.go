@@ -29,57 +29,6 @@ var (
 
 var defaultWalletRecoveredSnapshot string
 
-// Test registration with nodeset.io if the node doesn't have a wallet yet
-func TestNodeSetRegistration_NoWallet(t *testing.T) {
-	err := testMgr.DependsOnBaseline()
-	require.NoError(t, err)
-
-	// Run the round-trip test
-	hd := hdNode.GetApiClient()
-	response, err := hd.NodeSet.GetRegistrationStatus()
-	require.NoError(t, err)
-	require.Equal(t, api.NodeSetRegistrationStatus_NoWallet, response.Data.Status)
-	t.Logf("Node has no wallet, registration status is correct")
-}
-
-// Test registration with nodeset.io if the node has a wallet but hasn't been registered yet
-func TestNodeSetRegistration_NoRegistration(t *testing.T) {
-	err := testMgr.DependsOn(TestWalletRecover_Success, &defaultWalletRecoveredSnapshot, t)
-	require.NoError(t, err)
-
-	// Run the round-trip test
-	hd := hdNode.GetApiClient()
-	registrationResponse, err := hd.NodeSet.GetRegistrationStatus()
-	require.NoError(t, err)
-	require.Equal(t, api.NodeSetRegistrationStatus_Unregistered, registrationResponse.Data.Status)
-	t.Logf("Node has a wallet but isn't registered, registration status is correct")
-}
-
-// Test registration with nodeset.io if the node has a wallet and has been registered
-func TestNodeSetRegistration_Registered(t *testing.T) {
-	// Recover wallet loaded snapshot, revert at the end
-	err := testMgr.DependsOn(TestWalletRecover_Success, &defaultWalletRecoveredSnapshot, t)
-	require.NoError(t, err)
-
-	// Register the node with nodeset.io
-	hd := hdNode.GetApiClient()
-	nsMgr := testMgr.GetNodeSetMockServer().GetManager()
-	nsDB := nsMgr.GetDatabase()
-	user, err := nsDB.Core.AddUser(nsEmail)
-	require.NoError(t, err)
-	_ = user.WhitelistNode(expectedWalletAddress)
-	require.NoError(t, err)
-	registerResponse, err := hd.NodeSet.RegisterNode(nsEmail)
-	require.NoError(t, err)
-	require.True(t, registerResponse.Data.Success)
-
-	// Run the round-trip test
-	registrationResponse, err := hd.NodeSet.GetRegistrationStatus()
-	require.NoError(t, err)
-	require.Equal(t, api.NodeSetRegistrationStatus_Registered, registrationResponse.Data.Status)
-	t.Logf("Node is registered with nodeset.io")
-}
-
 func TestWalletRecover_Success(t *testing.T) {
 	err := testMgr.DependsOnBaseline()
 	require.NoError(t, err)
@@ -326,4 +275,55 @@ func TestWalletBalance(t *testing.T) {
 	// Check the response
 	require.Equal(t, expectedBalance, response.Data.Balance)
 	t.Logf("Received correct balance (%s)", response.Data.Balance.String())
+}
+
+// Test registration with nodeset.io if the node doesn't have a wallet yet
+func TestNodeSetRegistration_NoWallet(t *testing.T) {
+	err := testMgr.DependsOnBaseline()
+	require.NoError(t, err)
+
+	// Run the round-trip test
+	hd := hdNode.GetApiClient()
+	response, err := hd.NodeSet.GetRegistrationStatus()
+	require.NoError(t, err)
+	require.Equal(t, api.NodeSetRegistrationStatus_NoWallet, response.Data.Status)
+	t.Logf("Node has no wallet, registration status is correct")
+}
+
+// Test registration with nodeset.io if the node has a wallet but hasn't been registered yet
+func TestNodeSetRegistration_NoRegistration(t *testing.T) {
+	err := testMgr.DependsOn(TestWalletRecover_Success, &defaultWalletRecoveredSnapshot, t)
+	require.NoError(t, err)
+
+	// Run the round-trip test
+	hd := hdNode.GetApiClient()
+	registrationResponse, err := hd.NodeSet.GetRegistrationStatus()
+	require.NoError(t, err)
+	require.Equal(t, api.NodeSetRegistrationStatus_Unregistered, registrationResponse.Data.Status)
+	t.Logf("Node has a wallet but isn't registered, registration status is correct")
+}
+
+// Test registration with nodeset.io if the node has a wallet and has been registered
+func TestNodeSetRegistration_Registered(t *testing.T) {
+	// Recover wallet loaded snapshot, revert at the end
+	err := testMgr.DependsOn(TestWalletRecover_Success, &defaultWalletRecoveredSnapshot, t)
+	require.NoError(t, err)
+
+	// Register the node with nodeset.io
+	hd := hdNode.GetApiClient()
+	nsMgr := testMgr.GetNodeSetMockServer().GetManager()
+	nsDB := nsMgr.GetDatabase()
+	user, err := nsDB.Core.AddUser(nsEmail)
+	require.NoError(t, err)
+	_ = user.WhitelistNode(expectedWalletAddress)
+	require.NoError(t, err)
+	registerResponse, err := hd.NodeSet.RegisterNode(nsEmail)
+	require.NoError(t, err)
+	require.True(t, registerResponse.Data.Success)
+
+	// Run the round-trip test
+	registrationResponse, err := hd.NodeSet.GetRegistrationStatus()
+	require.NoError(t, err)
+	require.Equal(t, api.NodeSetRegistrationStatus_Registered, registrationResponse.Data.Status)
+	t.Logf("Node is registered with nodeset.io")
 }
