@@ -44,24 +44,8 @@ func TestNodeSetRegistration_NoWallet(t *testing.T) {
 
 // Test registration with nodeset.io if the node has a wallet but hasn't been registered yet
 func TestNodeSetRegistration_NoRegistration(t *testing.T) {
-	err := testMgr.DependsOnBaseline()
+	err := testMgr.DependsOn(TestWalletRecover_Success, &defaultWalletRecoveredSnapshot, t)
 	require.NoError(t, err)
-
-	// Recover a wallet
-	derivationPath := string(wallet.DerivationPath_Default)
-	index := uint64(0)
-	recoverResponse, err := hdNode.GetApiClient().Wallet.Recover(&derivationPath, keys.DefaultMnemonic, &index, goodPassword, true)
-	require.NoError(t, err)
-	t.Log("Recover called")
-
-	// Check the response
-	require.Equal(t, expectedWalletAddress, recoverResponse.Data.AccountAddress)
-	t.Log("Received correct wallet address")
-
-	defaultWalletRecoveredSnapshot, err = testMgr.CreateSnapshot()
-	if err != nil {
-		fail("Error creating custom snapshot: %v", err)
-	}
 
 	// Run the round-trip test
 	hd := hdNode.GetApiClient()
@@ -74,7 +58,7 @@ func TestNodeSetRegistration_NoRegistration(t *testing.T) {
 // Test registration with nodeset.io if the node has a wallet and has been registered
 func TestNodeSetRegistration_Registered(t *testing.T) {
 	// Recover wallet loaded snapshot, revert at the end
-	err := testMgr.DependsOn(TestNodeSetRegistration_NoRegistration, &defaultWalletRecoveredSnapshot, t)
+	err := testMgr.DependsOn(TestWalletRecover_Success, &defaultWalletRecoveredSnapshot, t)
 	require.NoError(t, err)
 
 	// Register the node with nodeset.io
@@ -96,9 +80,31 @@ func TestNodeSetRegistration_Registered(t *testing.T) {
 	t.Logf("Node is registered with nodeset.io")
 }
 
+func TestWalletRecover_Success(t *testing.T) {
+	err := testMgr.DependsOnBaseline()
+	require.NoError(t, err)
+
+	// Run the round-trip test
+	derivationPath := string(wallet.DerivationPath_Default)
+	index := uint64(0)
+	response, err := hdNode.GetApiClient().Wallet.Recover(&derivationPath, keys.DefaultMnemonic, &index, goodPassword, true)
+	require.NoError(t, err)
+	t.Log("Recover called")
+
+	// Check the response
+	require.Equal(t, expectedWalletAddress, response.Data.AccountAddress)
+	t.Log("Received correct wallet address")
+
+	// Take a snapshot, revert at the end
+	defaultWalletRecoveredSnapshot, err = testMgr.CreateSnapshot()
+	if err != nil {
+		fail("Error creating custom snapshot: %v", err)
+	}
+}
+
 func TestWalletStatus_Loaded(t *testing.T) {
 	// Recover wallet loaded snapshot, revert at the end
-	err := testMgr.DependsOn(TestNodeSetRegistration_NoRegistration, &defaultWalletRecoveredSnapshot, t)
+	err := testMgr.DependsOn(TestWalletRecover_Success, &defaultWalletRecoveredSnapshot, t)
 	require.NoError(t, err)
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
@@ -126,7 +132,7 @@ func TestWalletStatus_Loaded(t *testing.T) {
 
 func TestWalletSignMessage(t *testing.T) {
 	// Recover wallet loaded snapshot, revert at the end
-	err := testMgr.DependsOn(TestNodeSetRegistration_NoRegistration, &defaultWalletRecoveredSnapshot, t)
+	err := testMgr.DependsOn(TestWalletRecover_Success, &defaultWalletRecoveredSnapshot, t)
 	require.NoError(t, err)
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
@@ -161,7 +167,7 @@ func TestWalletSignMessage(t *testing.T) {
 
 func TestWalletSend_EthSuccess(t *testing.T) {
 	// Recover wallet loaded snapshot, revert at the end
-	err := testMgr.DependsOn(TestNodeSetRegistration_NoRegistration, &defaultWalletRecoveredSnapshot, t)
+	err := testMgr.DependsOn(TestWalletRecover_Success, &defaultWalletRecoveredSnapshot, t)
 	require.NoError(t, err)
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
@@ -215,7 +221,7 @@ func TestWalletSend_EthSuccess(t *testing.T) {
 
 func TestWalletSend_EthFailure(t *testing.T) {
 	// Recover wallet loaded snapshot, revert at the end
-	err := testMgr.DependsOn(TestNodeSetRegistration_NoRegistration, &defaultWalletRecoveredSnapshot, t)
+	err := testMgr.DependsOn(TestWalletRecover_Success, &defaultWalletRecoveredSnapshot, t)
 	require.NoError(t, err)
 
 	// Commit a block just so the latest block is fresh - otherwise the sync progress check will
