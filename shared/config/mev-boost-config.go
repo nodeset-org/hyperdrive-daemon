@@ -11,7 +11,8 @@ import (
 
 // Constants
 const (
-	mevBoostTag string = "flashbots/mev-boost:1.8.1"
+	mevBoostProdTag string = "flashbots/mev-boost:1.8.1"
+	mevBoostTestTag string = "flashbots/mev-boost:1.9rc2"
 )
 
 // A MEV relay
@@ -213,7 +214,8 @@ func NewMevBoostConfig(parent *HyperdriveConfig) *MevBoostConfig {
 				OverwriteOnUpgrade: true,
 			},
 			Default: map[config.Network]string{
-				config.Network_All: mevBoostTag,
+				config.Network_Holesky: mevBoostTestTag,
+				config.Network_All:     mevBoostProdTag,
 			},
 		},
 
