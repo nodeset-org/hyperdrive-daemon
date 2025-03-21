@@ -20,12 +20,12 @@ import (
 // === Factory ===
 // ===============
 
-type stakeWiseGetDepositDataSetVersionContextFactory struct {
+type stakeWiseGetValidatorsInfoContextFactory struct {
 	handler *StakeWiseHandler
 }
 
-func (f *stakeWiseGetDepositDataSetVersionContextFactory) Create(args url.Values) (*stakeWiseGetDepositDataSetVersionContext, error) {
-	c := &stakeWiseGetDepositDataSetVersionContext{
+func (f *stakeWiseGetValidatorsInfoContextFactory) Create(args url.Values) (*stakeWiseGetValidatorsInfoContext, error) {
+	c := &stakeWiseGetValidatorsInfoContext{
 		handler: f.handler,
 	}
 	inputErrs := []error{
@@ -35,23 +35,23 @@ func (f *stakeWiseGetDepositDataSetVersionContextFactory) Create(args url.Values
 	return c, errors.Join(inputErrs...)
 }
 
-func (f *stakeWiseGetDepositDataSetVersionContextFactory) RegisterRoute(router *mux.Router) {
-	server.RegisterQuerylessGet[*stakeWiseGetDepositDataSetVersionContext, api.NodeSetStakeWise_GetDepositDataSetVersionData](
-		router, "get-deposit-data-set/version", f, f.handler.logger.Logger, f.handler.serviceProvider,
+func (f *stakeWiseGetValidatorsInfoContextFactory) RegisterRoute(router *mux.Router) {
+	server.RegisterQuerylessGet[*stakeWiseGetValidatorsInfoContext, api.NodeSetStakeWise_GetValidatorsInfoData](
+		router, "get-validators-info", f, f.handler.logger.Logger, f.handler.serviceProvider,
 	)
 }
 
 // ===============
 // === Context ===
 // ===============
-type stakeWiseGetDepositDataSetVersionContext struct {
+type stakeWiseGetValidatorsInfoContext struct {
 	handler *StakeWiseHandler
 
 	deployment string
 	vault      common.Address
 }
 
-func (c *stakeWiseGetDepositDataSetVersionContext) PrepareData(data *api.NodeSetStakeWise_GetDepositDataSetVersionData, opts *bind.TransactOpts) (types.ResponseStatus, error) {
+func (c *stakeWiseGetValidatorsInfoContext) PrepareData(data *api.NodeSetStakeWise_GetValidatorsInfoData, opts *bind.TransactOpts) (types.ResponseStatus, error) {
 	sp := c.handler.serviceProvider
 	ctx := c.handler.ctx
 
@@ -69,13 +69,15 @@ func (c *stakeWiseGetDepositDataSetVersionContext) PrepareData(data *api.NodeSet
 		return types.ResponseStatus_Error, err
 	}
 
-	// Get the set version
+	// Get the validators info for this node
 	ns := sp.GetNodeSetServiceManager()
-	version, err := ns.StakeWise_GetServerDepositDataVersion(ctx, c.deployment, c.vault)
+	response, err := ns.StakeWise_GetValidatorsInfoForNodeAccount(ctx, c.deployment, c.vault)
 	if err != nil {
 		return types.ResponseStatus_Error, err
 	}
 
-	data.Version = version
+	data.Active = int(response.Active)
+	data.Max = int(response.Max)
+	data.Available = int(response.Available)
 	return types.ResponseStatus_Success, nil
 }

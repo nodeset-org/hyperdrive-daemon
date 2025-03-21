@@ -18,33 +18,34 @@ import (
 // === Factory ===
 // ===============
 
-type stakeWiseUploadDepositDataContextFactory struct {
+type stakeWiseGetValidatorManagerSignatureContextFactory struct {
 	handler *StakeWiseHandler
 }
 
-func (f *stakeWiseUploadDepositDataContextFactory) Create(body api.NodeSetStakeWise_UploadDepositDataRequestBody) (*stakeWiseUploadDepositDataContext, error) {
-	c := &stakeWiseUploadDepositDataContext{
+func (f *stakeWiseGetValidatorManagerSignatureContextFactory) Create(body api.NodeSetStakeWise_GetValidatorManagerSignatureRequestBody) (*stakeWiseGetValidatorManagerSignatureContext, error) {
+	c := &stakeWiseGetValidatorManagerSignatureContext{
 		handler: f.handler,
 		body:    body,
 	}
 	return c, nil
 }
 
-func (f *stakeWiseUploadDepositDataContextFactory) RegisterRoute(router *mux.Router) {
-	server.RegisterQuerylessPost[*stakeWiseUploadDepositDataContext, api.NodeSetStakeWise_UploadDepositDataRequestBody, api.NodeSetStakeWise_UploadDepositDataData](
-		router, "upload-deposit-data", f, f.handler.logger.Logger, f.handler.serviceProvider,
+func (f *stakeWiseGetValidatorManagerSignatureContextFactory) RegisterRoute(router *mux.Router) {
+	server.RegisterQuerylessPost[*stakeWiseGetValidatorManagerSignatureContext, api.NodeSetStakeWise_GetValidatorManagerSignatureRequestBody, api.NodeSetStakeWise_GetValidatorManagerSignatureData](
+		router, "get-validator-manager-signature", f, f.handler.logger.Logger, f.handler.serviceProvider,
 	)
 }
 
 // ===============
 // === Context ===
 // ===============
-type stakeWiseUploadDepositDataContext struct {
+
+type stakeWiseGetValidatorManagerSignatureContext struct {
 	handler *StakeWiseHandler
-	body    api.NodeSetStakeWise_UploadDepositDataRequestBody
+	body    api.NodeSetStakeWise_GetValidatorManagerSignatureRequestBody
 }
 
-func (c *stakeWiseUploadDepositDataContext) PrepareData(data *api.NodeSetStakeWise_UploadDepositDataData, opts *bind.TransactOpts) (types.ResponseStatus, error) {
+func (c *stakeWiseGetValidatorManagerSignatureContext) PrepareData(data *api.NodeSetStakeWise_GetValidatorManagerSignatureData, opts *bind.TransactOpts) (types.ResponseStatus, error) {
 	sp := c.handler.serviceProvider
 	ctx := c.handler.ctx
 
@@ -62,9 +63,16 @@ func (c *stakeWiseUploadDepositDataContext) PrepareData(data *api.NodeSetStakeWi
 		return types.ResponseStatus_Error, err
 	}
 
-	// Upload the deposit data
+	// Request the signature
 	ns := sp.GetNodeSetServiceManager()
-	err = ns.StakeWise_UploadDepositData(ctx, c.body.Deployment, c.body.Vault, c.body.DepositData)
+	signature, err := ns.StakeWise_GetValidatorManagerSignature(
+		ctx,
+		c.body.Deployment,
+		c.body.Vault,
+		c.body.BeaconDepositRoot,
+		c.body.DepositData,
+		c.body.EncryptedExitMessages,
+	)
 	if err != nil {
 		if errors.Is(err, apiv0.ErrVaultNotFound) {
 			data.VaultNotFound = true
@@ -76,5 +84,8 @@ func (c *stakeWiseUploadDepositDataContext) PrepareData(data *api.NodeSetStakeWi
 		}
 		return types.ResponseStatus_Error, err
 	}
+
+	// Success
+	data.Signature = signature
 	return types.ResponseStatus_Success, nil
 }

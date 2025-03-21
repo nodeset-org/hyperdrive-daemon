@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/ethereum/go-ethereum/common"
-	v2constellation "github.com/nodeset-org/nodeset-client-go/api-v2/constellation"
+	v3constellation "github.com/nodeset-org/nodeset-client-go/api-v3/constellation"
 	nscommon "github.com/nodeset-org/nodeset-client-go/common"
 )
 
@@ -37,7 +37,7 @@ type NodeSetConstellation_GetValidatorsData struct {
 	NotWhitelisted       bool                              `json:"notWhitelisted"`
 	IncorrectNodeAddress bool                              `json:"incorrectNodeAddress"`
 	InvalidPermissions   bool                              `json:"invalidPermissions"`
-	Validators           []v2constellation.ValidatorStatus `json:"validators"`
+	Validators           []v3constellation.ValidatorStatus `json:"validators"`
 }
 
 type NodeSetConstellation_UploadSignedExitsRequestBody struct {

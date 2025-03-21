@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/ethereum/go-ethereum/common"
-	nscommon "github.com/nodeset-org/nodeset-client-go/common"
 	"github.com/nodeset-org/nodeset-client-go/common/stakewise"
 	"github.com/rocket-pool/node-manager-core/beacon"
 )
@@ -12,35 +11,24 @@ type NodeSetStakeWise_GetRegisteredValidatorsData struct {
 	Validators    []stakewise.ValidatorStatus `json:"validators"`
 }
 
-type NodeSetStakeWise_GetDepositDataSetVersionData struct {
+type NodeSetStakeWise_GetValidatorsInfoData struct {
 	NotRegistered bool `json:"notRegistered"`
-	Version       int  `json:"version"`
+	Active        int  `json:"active"`
+	Max           int  `json:"max"`
+	Available     int  `json:"available"`
 }
 
-type NodeSetStakeWise_GetDepositDataSetData struct {
-	NotRegistered bool                         `json:"notRegistered"`
-	Version       int                          `json:"version"`
-	DepositData   []beacon.ExtendedDepositData `json:"depositData"`
+type NodeSetStakeWise_GetValidatorManagerSignatureRequestBody struct {
+	Deployment            string                       `json:"deployment"`
+	Vault                 common.Address               `json:"vault"`
+	BeaconDepositRoot     common.Hash                  `json:"beaconDepositRoot"`
+	DepositData           []beacon.ExtendedDepositData `json:"depositData"`
+	EncryptedExitMessages []string                     `json:"encryptedExitMessages"`
 }
 
-type NodeSetStakeWise_UploadDepositDataRequestBody struct {
-	Deployment  string                       `json:"deployment"`
-	Vault       common.Address               `json:"vault"`
-	DepositData []beacon.ExtendedDepositData `json:"depositData"`
-}
-
-type NodeSetStakeWise_UploadDepositDataData struct {
-	NotRegistered      bool `json:"notRegistered"`
-	VaultNotFound      bool `json:"vaultNotFound"`
-	InvalidPermissions bool `json:"invalidPermissions"`
-}
-
-type NodeSetStakeWise_UploadSignedExitsRequestBody struct {
-	Deployment string                       `json:"deployment"`
-	Vault      common.Address               `json:"vault"`
-	ExitData   []nscommon.EncryptedExitData `json:"exitData"`
-}
-
-type NodeSetStakeWise_UploadSignedExitsData struct {
-	NotRegistered bool `json:"notRegistered"`
+type NodeSetStakeWise_GetValidatorManagerSignatureData struct {
+	NotRegistered      bool   `json:"notRegistered"`
+	VaultNotFound      bool   `json:"vaultNotFound"`
+	InvalidPermissions bool   `json:"invalidPermissions"`
+	Signature          string `json:"signature"`
 }

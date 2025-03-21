@@ -23,11 +23,9 @@ func NewStakeWiseHandler(logger *log.Logger, ctx context.Context, serviceProvide
 		serviceProvider: serviceProvider,
 	}
 	h.factories = []server.IContextFactory{
-		&stakeWiseGetDepositDataSetContextFactory{h},
-		&stakeWiseGetDepositDataSetVersionContextFactory{h},
+		&stakeWiseGetValidatorsInfoContextFactory{h},
 		&stakeWiseGetRegisteredValidatorsContextFactory{h},
-		&stakeWiseUploadDepositDataContextFactory{h},
-		&stakeWiseUploadSignedExitsContextFactory{h},
+		&stakeWiseGetValidatorManagerSignatureContextFactory{h},
 	}
 	return h
 }
