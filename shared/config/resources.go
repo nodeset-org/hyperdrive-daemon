@@ -30,8 +30,18 @@ var (
 		NodeSetApiUrl: NodesetUrlProd,
 	}
 
-	// Devnet resources for reference in testing
+	// Holesky Devnet resources for reference in testing
 	HoleskyDevResourcesReference *HyperdriveResources = &HyperdriveResources{
+		NodeSetApiUrl: NodesetUrlStaging,
+	}
+
+	// Hoodi resources for reference in testing
+	HoodiResourcesReference *HyperdriveResources = &HyperdriveResources{
+		NodeSetApiUrl: NodesetUrlProd,
+	}
+
+	// Hoodi Devnet resources for reference in testing
+	HoodiDevResourcesReference *HyperdriveResources = &HyperdriveResources{
 		NodeSetApiUrl: NodesetUrlStaging,
 	}
 )

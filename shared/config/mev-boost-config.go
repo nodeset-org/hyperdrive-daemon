@@ -214,6 +214,7 @@ func NewMevBoostConfig(parent *HyperdriveConfig) *MevBoostConfig {
 				OverwriteOnUpgrade: true,
 			},
 			Default: map[config.Network]string{
+				config.Network_Hoodi:   mevBoostTestTag,
 				config.Network_Holesky: mevBoostTestTag,
 				config.Network_All:     mevBoostProdTag,
 			},
