@@ -2,13 +2,13 @@ package api
 
 import (
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/nodeset-org/nodeset-client-go/common/stakewise"
+	v3stakewise "github.com/nodeset-org/nodeset-client-go/api-v3/stakewise"
 	"github.com/rocket-pool/node-manager-core/beacon"
 )
 
 type NodeSetStakeWise_GetRegisteredValidatorsData struct {
-	NotRegistered bool                        `json:"notRegistered"`
-	Validators    []stakewise.ValidatorStatus `json:"validators"`
+	NotRegistered bool                          `json:"notRegistered"`
+	Validators    []v3stakewise.ValidatorStatus `json:"validators"`
 }
 
 type NodeSetStakeWise_GetValidatorsInfoData struct {

@@ -9,6 +9,7 @@ import (
 	"github.com/nodeset-org/hyperdrive-daemon/shared/types/api"
 	v2constellation "github.com/nodeset-org/nodeset-client-go/api-v2/constellation"
 	"github.com/nodeset-org/nodeset-client-go/common"
+	nscommon "github.com/nodeset-org/nodeset-client-go/common"
 
 	"github.com/rocket-pool/node-manager-core/api/server"
 	"github.com/rocket-pool/node-manager-core/api/types"
@@ -67,11 +68,11 @@ func (c *constellationUploadSignedExitsContext) PrepareData(data *api.NodeSetCon
 	ns := sp.GetNodeSetServiceManager()
 	err = ns.Constellation_UploadSignedExitMessages(ctx, c.body.Deployment, c.body.ExitMessages)
 	if err != nil {
-		if errors.Is(err, v2constellation.ErrMissingWhitelistedNodeAddress) {
+		if errors.Is(err, nscommon.ErrMissingWhitelistedNodeAddress) {
 			data.NotWhitelisted = true
 			return types.ResponseStatus_Success, nil
 		}
-		if errors.Is(err, v2constellation.ErrIncorrectNodeAddress) {
+		if errors.Is(err, nscommon.ErrIncorrectNodeAddress) {
 			data.IncorrectNodeAddress = true
 			return types.ResponseStatus_Success, nil
 		}

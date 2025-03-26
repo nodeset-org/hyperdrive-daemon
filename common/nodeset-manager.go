@@ -132,7 +132,7 @@ func (m *NodeSetServiceManager) RegisterNode(ctx context.Context, email string) 
 // =========================
 
 // Get the metadata for the node account with respect to the provided vault
-func (m *NodeSetServiceManager) StakeWise_GetValidatorsInfoForNodeAccount(ctx context.Context, deployment string, vault common.Address) (stakewise.VaultsMetaData, error) {
+func (m *NodeSetServiceManager) StakeWise_GetValidatorsInfoForNodeAccount(ctx context.Context, deployment string, vault common.Address) (stakewise.ValidatorsMetaData, error) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
 
@@ -144,14 +144,14 @@ func (m *NodeSetServiceManager) StakeWise_GetValidatorsInfoForNodeAccount(ctx co
 	logger.Debug("Getting server validators info for node account")
 
 	// Run the request
-	var data stakewise.VaultsMetaData
+	var data stakewise.ValidatorsMetaData
 	err := m.runRequest(ctx, func(ctx context.Context) error {
 		var err error
 		data, err = m.v3Client.StakeWise.ValidatorMeta_Get(ctx, logger.Logger, deployment, vault)
 		return err
 	})
 	if err != nil {
-		return stakewise.VaultsMetaData{}, fmt.Errorf("error getting validators info for node account: %w", err)
+		return stakewise.ValidatorsMetaData{}, fmt.Errorf("error getting validators info for node account: %w", err)
 	}
 	return data, nil
 }
@@ -184,7 +184,7 @@ func (m *NodeSetServiceManager) StakeWise_GetValidatorManagerSignature(ctx conte
 	var data v3stakewise.PostValidatorData
 	err := m.runRequest(ctx, func(ctx context.Context) error {
 		var err error
-		data, err = m.v3Client.StakeWise.Validator_Post(ctx, logger.Logger, deployment, vault, validators, beaconDepositRoot)
+		data, err = m.v3Client.StakeWise.Validators_Post(ctx, logger.Logger, deployment, vault, validators, beaconDepositRoot)
 		return err
 	})
 	if err != nil {
@@ -194,7 +194,7 @@ func (m *NodeSetServiceManager) StakeWise_GetValidatorManagerSignature(ctx conte
 }
 
 // Get the version of the latest deposit data set from the server
-func (m *NodeSetServiceManager) StakeWise_GetRegisteredValidators(ctx context.Context, deployment string, vault common.Address) ([]stakewise.ValidatorStatus, error) {
+func (m *NodeSetServiceManager) StakeWise_GetRegisteredValidators(ctx context.Context, deployment string, vault common.Address) ([]v3stakewise.ValidatorStatus, error) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
 
@@ -206,7 +206,7 @@ func (m *NodeSetServiceManager) StakeWise_GetRegisteredValidators(ctx context.Co
 	logger.Debug("Getting registered validators")
 
 	// Run the request
-	var data stakewise.ValidatorsData
+	var data v3stakewise.ValidatorsData
 	err := m.runRequest(ctx, func(ctx context.Context) error {
 		var err error
 		data, err = m.v3Client.StakeWise.Validators_Get(ctx, logger.Logger, deployment, vault)
