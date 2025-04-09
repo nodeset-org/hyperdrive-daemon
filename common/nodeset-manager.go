@@ -194,7 +194,7 @@ func (m *NodeSetServiceManager) StakeWise_GetValidatorManagerSignature(ctx conte
 }
 
 // Get the vaults for the provided deployment
-func (m *NodeSetServiceManager) StakeWise_GetVaults(ctx context.Context, deployment string) ([]common.Address, error) {
+func (m *NodeSetServiceManager) StakeWise_GetVaults(ctx context.Context, deployment string) ([]v3stakewise.VaultInfo, error) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
 

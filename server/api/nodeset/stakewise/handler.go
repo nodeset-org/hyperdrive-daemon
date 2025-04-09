@@ -26,6 +26,7 @@ func NewStakeWiseHandler(logger *log.Logger, ctx context.Context, serviceProvide
 		&stakeWiseGetValidatorsInfoContextFactory{h},
 		&stakeWiseGetRegisteredValidatorsContextFactory{h},
 		&stakeWiseGetValidatorManagerSignatureContextFactory{h},
+		&stakeWiseGetVaultsContextFactory{h},
 	}
 	return h
 }

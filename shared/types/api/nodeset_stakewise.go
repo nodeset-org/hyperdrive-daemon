@@ -7,9 +7,9 @@ import (
 )
 
 type NodeSetStakeWise_GetVaultsData struct {
-	NotRegistered      bool             `json:"notRegistered"`
-	InvalidPermissions bool             `json:"invalidPermissions"`
-	Vaults             []common.Address `json:"vaults"`
+	NotRegistered      bool                    `json:"notRegistered"`
+	InvalidPermissions bool                    `json:"invalidPermissions"`
+	Vaults             []v3stakewise.VaultInfo `json:"vaults"`
 }
 
 type NodeSetStakeWise_GetRegisteredValidatorsData struct {
