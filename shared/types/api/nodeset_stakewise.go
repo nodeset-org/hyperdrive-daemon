@@ -6,9 +6,16 @@ import (
 	"github.com/rocket-pool/node-manager-core/beacon"
 )
 
+type NodeSetStakeWise_GetVaultsData struct {
+	NotRegistered      bool             `json:"notRegistered"`
+	InvalidPermissions bool             `json:"invalidPermissions"`
+	Vaults             []common.Address `json:"vaults"`
+}
+
 type NodeSetStakeWise_GetRegisteredValidatorsData struct {
-	NotRegistered bool                          `json:"notRegistered"`
-	Validators    []v3stakewise.ValidatorStatus `json:"validators"`
+	NotRegistered      bool                          `json:"notRegistered"`
+	InvalidPermissions bool                          `json:"invalidPermissions"`
+	Validators         []v3stakewise.ValidatorStatus `json:"validators"`
 }
 
 type NodeSetStakeWise_GetValidatorsInfoData struct {

@@ -29,6 +29,14 @@ func (r *NodeSetStakeWiseRequester) GetContext() client.IRequesterContext {
 	return r.context
 }
 
+// Gets the list of vaults on the given deployment
+func (r *NodeSetStakeWiseRequester) GetVaults(deployment string) (*types.ApiResponse[api.NodeSetStakeWise_GetVaultsData], error) {
+	args := map[string]string{
+		"deployment": deployment,
+	}
+	return client.SendGetRequest[api.NodeSetStakeWise_GetVaultsData](r, "get-vaults", "GetVaults", args)
+}
+
 // Gets the list of validators that the node has registered with the provided vault
 func (r *NodeSetStakeWiseRequester) GetRegisteredValidators(deployment string, vault common.Address) (*types.ApiResponse[api.NodeSetStakeWise_GetRegisteredValidatorsData], error) {
 	args := map[string]string{

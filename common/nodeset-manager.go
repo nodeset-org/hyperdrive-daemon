@@ -193,7 +193,32 @@ func (m *NodeSetServiceManager) StakeWise_GetValidatorManagerSignature(ctx conte
 	return data.Signature, nil
 }
 
-// Get the version of the latest deposit data set from the server
+// Get the vaults for the provided deployment
+func (m *NodeSetServiceManager) StakeWise_GetVaults(ctx context.Context, deployment string) ([]common.Address, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
+	// Get the logger
+	logger, exists := log.FromContext(ctx)
+	if !exists {
+		panic("context didn't have a logger!")
+	}
+	logger.Debug("Getting registered validators")
+
+	// Run the request
+	var data v3stakewise.VaultsData
+	err := m.runRequest(ctx, func(ctx context.Context) error {
+		var err error
+		data, err = m.v3Client.StakeWise.Vaults(ctx, logger.Logger, deployment)
+		return err
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error getting registered validators: %w", err)
+	}
+	return data.Vaults, nil
+}
+
+// Get the validators that have been registered on the provided vault
 func (m *NodeSetServiceManager) StakeWise_GetRegisteredValidators(ctx context.Context, deployment string, vault common.Address) ([]v3stakewise.ValidatorStatus, error) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
