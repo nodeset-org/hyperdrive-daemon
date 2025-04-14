@@ -19,10 +19,10 @@ type NodeSetStakeWise_GetRegisteredValidatorsData struct {
 }
 
 type NodeSetStakeWise_GetValidatorsInfoData struct {
-	NotRegistered bool `json:"notRegistered"`
-	Active        int  `json:"active"`
-	Max           int  `json:"max"`
-	Available     int  `json:"available"`
+	NotRegistered        bool `json:"notRegistered"`
+	RegisteredValidators int  `json:"registeredValidators"`
+	MaxValidators        int  `json:"maxValidators"`
+	AvailableValidators  int  `json:"availableValidators"`
 }
 
 type NodeSetStakeWise_GetValidatorManagerSignatureRequestBody struct {
