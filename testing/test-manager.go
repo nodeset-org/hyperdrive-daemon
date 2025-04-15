@@ -193,7 +193,6 @@ func (m *HyperdriveTestManager) CloseModule() error {
 		return fmt.Errorf("error closing Hyperdrive node: %w", err)
 	}
 	if m.TestManager != nil {
-		err := m.TestManager.Close()
 		m.TestManager = nil
 		return err
 	}
