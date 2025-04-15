@@ -15,7 +15,7 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/hashicorp/go-version v1.6.0
 	github.com/nodeset-org/nodeset-client-go v1.2.3-0.20250414212133-c46c955a2b6f
-	github.com/nodeset-org/osha v0.3.1
+	github.com/nodeset-org/osha v0.3.2-0.20250415074543-3046f0e46f15
 	github.com/rocket-pool/batch-query v1.0.0
 	github.com/rocket-pool/node-manager-core v0.5.2-0.20250415054156-641a7400f233
 	github.com/stretchr/testify v1.9.0
