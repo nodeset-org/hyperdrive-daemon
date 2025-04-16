@@ -9,7 +9,6 @@ import (
 	"github.com/nodeset-org/nodeset-client-go/common/stakewise"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/gorilla/mux"
 
 	"github.com/rocket-pool/node-manager-core/api/server"
@@ -47,7 +46,6 @@ type stakeWiseGetVaultsContext struct {
 	handler *StakeWiseHandler
 
 	deployment string
-	vault      common.Address
 }
 
 func (c *stakeWiseGetVaultsContext) PrepareData(data *api.NodeSetStakeWise_GetVaultsData, opts *bind.TransactOpts) (types.ResponseStatus, error) {
