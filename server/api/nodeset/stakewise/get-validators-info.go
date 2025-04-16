@@ -76,8 +76,8 @@ func (c *stakeWiseGetValidatorsInfoContext) PrepareData(data *api.NodeSetStakeWi
 		return types.ResponseStatus_Error, err
 	}
 
-	data.RegisteredValidators = int(response.Registered)
-	data.MaxValidators = int(response.Max)
-	data.AvailableValidators = int(response.Available)
+	data.RegisteredValidators = response.Registered
+	data.MaxValidators = response.Max
+	data.AvailableValidators = response.Available
 	return types.ResponseStatus_Success, nil
 }
