@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/nodeset-org/hyperdrive-daemon/common"
 	hdconfig "github.com/nodeset-org/hyperdrive-daemon/shared/config"
 	nsserver "github.com/nodeset-org/nodeset-client-go/server-mock/server"
@@ -46,7 +47,20 @@ func NewHyperdriveTestManager(address string, port uint, cfg *hdconfig.Hyperdriv
 	if err != nil {
 		return nil, fmt.Errorf("error creating test manager: %w", err)
 	}
-	return newHyperdriveTestManagerImpl(address, tm, cfg, resources, nsServer, nil)
+	module, err := newHyperdriveTestManagerImpl(address, tm, cfg, resources, nsServer, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error creating Hyperdrive test manager: %w", err)
+	}
+	// Register the module
+	tm.RegisterModule(module)
+
+	// Take a baseline snapshot
+	baselineSnapshot, err := tm.CreateSnapshot()
+	if err != nil {
+		return nil, fmt.Errorf("error creating baseline snapshot: %w", err)
+	}
+	module.baselineSnapshotID = baselineSnapshot
+	return module, nil
 }
 
 // Creates a new HyperdriveTestManager instance with default test artifacts.
@@ -88,7 +102,21 @@ func NewHyperdriveTestManagerWithDefaults(netSettingsProvisioner NetworkSettings
 	cfg.ApiPort.Value = 0
 
 	// Make the test manager
-	return newHyperdriveTestManagerImpl("localhost", tm, cfg, resources, nodesetMock, nsWg)
+	module, err := newHyperdriveTestManagerImpl("localhost", tm, cfg, resources, nodesetMock, nsWg)
+	if err != nil {
+		return nil, fmt.Errorf("error creating Hyperdrive test manager: %w", err)
+	}
+	tm.RegisterModule(module)
+	baselineSnapshot, err := tm.CreateSnapshot()
+	if err != nil {
+		return nil, fmt.Errorf("error creating baseline snapshot: %w", err)
+	}
+	module.baselineSnapshotID = baselineSnapshot
+
+	if err != nil {
+		return nil, fmt.Errorf("error registering module: %w", err)
+	}
+	return module, nil
 }
 
 // Implementation for creating a new HyperdriveTestManager
@@ -136,18 +164,11 @@ func newHyperdriveTestManagerImpl(address string, tm *osha.TestManager, cfg *hdc
 		snapshotServiceMap: map[string]Service{},
 	}
 
-	// Create the baseline snapshot
-	baselineSnapshotID, err := m.takeSnapshot(Service_All)
-	if err != nil {
-		return nil, fmt.Errorf("error creating baseline snapshot: %w", err)
-	}
-	m.baselineSnapshotID = baselineSnapshotID
-
 	return m, nil
 }
 
 // Closes the Hyperdrive test manager, shutting down the daemon
-func (m *HyperdriveTestManager) Close() error {
+func (m *HyperdriveTestManager) CloseModule() error {
 	if m.nodesetMock != nil {
 		// Check if we're managing the service - if so just stop it
 		if m.nsWg != nil {
@@ -172,7 +193,6 @@ func (m *HyperdriveTestManager) Close() error {
 		return fmt.Errorf("error closing Hyperdrive node: %w", err)
 	}
 	if m.TestManager != nil {
-		err := m.TestManager.Close()
 		m.TestManager = nil
 		return err
 	}
@@ -193,75 +213,43 @@ func (m *HyperdriveTestManager) GetNodeSetMockServer() *nsserver.NodeSetMockServ
 	return m.nodesetMock
 }
 
+func (m *HyperdriveTestManager) GetModuleName() string {
+	return "hyperdrive-daemon"
+}
+
 // ====================
 // === Snapshotting ===
 // ====================
 
-// Reverts the services to the baseline snapshot
-func (m *HyperdriveTestManager) RevertToBaseline() error {
-	err := m.TestManager.RevertToBaseline()
+// Takes a snapshot of the service states
+func (m *HyperdriveTestManager) DependsOnBaseline() error {
+	err := m.RevertSnapshot(m.baselineSnapshotID)
 	if err != nil {
-		return fmt.Errorf("error reverting to baseline snapshot: %w", err)
+		return fmt.Errorf("error reverting to baseline snapshot %s: %w", m.baselineSnapshotID, err)
 	}
-
-	// Regenerate the baseline snapshot since Hardhat can't revert to it multiple times
-	baselineSnapshotID, err := m.takeSnapshot(Service_All)
-	if err != nil {
-		return fmt.Errorf("error creating baseline snapshot: %w", err)
-	}
-	m.baselineSnapshotID = baselineSnapshotID
 	return nil
 }
 
 // Takes a snapshot of the service states
-func (m *HyperdriveTestManager) CreateCustomSnapshot(services Service) (string, error) {
-	return m.takeSnapshot(services)
-}
-
-// Revert the services to a snapshot state
-func (m *HyperdriveTestManager) RevertToCustomSnapshot(snapshotID string) error {
-	return m.revertToSnapshot(snapshotID)
-}
-
-// ==========================
-// === Internal Functions ===
-// ==========================
-
-// Takes a snapshot of the service states
-func (m *HyperdriveTestManager) takeSnapshot(services Service) (string, error) {
-	// Run the parent snapshotter
-	parentServices := osha.Service(services)
-	snapshotName, err := m.TestManager.CreateCustomSnapshot(parentServices)
-	if err != nil {
-		return "", fmt.Errorf("error taking snapshot: %w", err)
-	}
-
-	// Snapshot the nodeset.io mock
-	if services.Contains(Service_NodeSet) {
-		m.nodesetMock.GetManager().TakeSnapshot(snapshotName)
-	}
-
-	// Store the services that were captured
-	m.snapshotServiceMap[snapshotName] = services
+func (m *HyperdriveTestManager) TakeModuleSnapshot() (any, error) {
+	snapshotName := uuid.New().String()
+	m.nodesetMock.GetManager().TakeSnapshot(snapshotName)
 	return snapshotName, nil
 }
 
 // Revert the services to a snapshot state
-func (m *HyperdriveTestManager) revertToSnapshot(snapshotID string) error {
-	services, exists := m.snapshotServiceMap[snapshotID]
-	if !exists {
-		return fmt.Errorf("snapshot with ID [%s] does not exist", snapshotID)
+func (m *HyperdriveTestManager) RevertModuleToSnapshot(moduleState any) error {
+	err := m.nodesetMock.GetManager().RevertToSnapshot(moduleState.(string))
+	if err != nil {
+		return fmt.Errorf("error reverting the nodeset.io mock to snapshot %s: %w", moduleState, err)
 	}
 
-	// Revert the nodeset.io mock
-	if services.Contains(Service_NodeSet) {
-		err := m.nodesetMock.GetManager().RevertToSnapshot(snapshotID)
-		if err != nil {
-			return fmt.Errorf("error reverting the nodeset.io mock to snapshot %s: %w", snapshotID, err)
-		}
+	wallet := m.node.sp.GetWallet()
+	err = wallet.Reload(m.GetLogger())
+	if err != nil {
+		return fmt.Errorf("error reloading wallet: %w", err)
 	}
-
-	return m.TestManager.RevertToCustomSnapshot(snapshotID)
+	return nil
 }
 
 // Closes the OSHA test manager, logging any errors

@@ -7,7 +7,6 @@ import (
 
 	hdcommon "github.com/nodeset-org/hyperdrive-daemon/common"
 	"github.com/nodeset-org/hyperdrive-daemon/shared/types/api"
-	v2constellation "github.com/nodeset-org/nodeset-client-go/api-v2/constellation"
 	nscommon "github.com/nodeset-org/nodeset-client-go/common"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -78,23 +77,23 @@ func (c *constellationGetDepositSignatureContext) PrepareData(data *api.NodeSetC
 	ns := sp.GetNodeSetServiceManager()
 	signature, err := ns.Constellation_GetDepositSignature(ctx, c.deployment, c.minipoolAddress, c.salt)
 	if err != nil {
-		if errors.Is(err, v2constellation.ErrMissingWhitelistedNodeAddress) {
+		if errors.Is(err, nscommon.ErrMissingWhitelistedNodeAddress) {
 			data.NotWhitelisted = true
 			return types.ResponseStatus_Success, nil
 		}
-		if errors.Is(err, v2constellation.ErrIncorrectNodeAddress) {
+		if errors.Is(err, nscommon.ErrIncorrectNodeAddress) {
 			data.IncorrectNodeAddress = true
 			return types.ResponseStatus_Success, nil
 		}
-		if errors.Is(err, v2constellation.ErrMinipoolLimitReached) {
+		if errors.Is(err, nscommon.ErrMinipoolLimitReached) {
 			data.LimitReached = true
 			return types.ResponseStatus_Success, nil
 		}
-		if errors.Is(err, v2constellation.ErrMissingExitMessage) {
+		if errors.Is(err, nscommon.ErrMissingExitMessage) {
 			data.MissingExitMessage = true
 			return types.ResponseStatus_Success, nil
 		}
-		if errors.Is(err, v2constellation.ErrAddressAlreadyRegistered) {
+		if errors.Is(err, nscommon.ErrAddressAlreadyRegistered) {
 			data.AddressAlreadyRegistered = true
 			return types.ResponseStatus_Success, nil
 		}
