@@ -12,7 +12,7 @@ import (
 // Constants
 const (
 	mevBoostProdTag string = "flashbots/mev-boost:1.8.1"
-	mevBoostTestTag string = "flashbots/mev-boost:1.9rc2"
+	mevBoostTestTag string = "flashbots/mev-boost:1.9rc3"
 )
 
 // A MEV relay
@@ -398,6 +398,7 @@ func createDefaultRelays() []MevRelay {
 			Urls: map[string]string{
 				config.EthNetwork_Mainnet: "https://0xac6e77dfe25ecd6110b8e780608cce0dab71fdd5ebea22a16c0205200f2f8e2e3ad3b71d3499c54ad14d6c21b41a37ae@boost-relay.flashbots.net?id=hyperdrive",
 				config.EthNetwork_Holesky: "https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@boost-relay-holesky.flashbots.net?id=hyperdrive",
+				config.EthNetwork_Hoodi:   "https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@boost-relay-hoodi.flashbots.net",
 			},
 		},
 
@@ -409,6 +410,7 @@ func createDefaultRelays() []MevRelay {
 			Urls: map[string]string{
 				config.EthNetwork_Mainnet: "https://0x8b5d2e73e2a3a55c6c87b8b6eb92e0149a125c852751db1422fa951e42a09b82c142c3ea98d0d9930b056a3bc9896b8f@bloxroute.max-profit.blxrbdn.com?id=hyperdrive",
 				config.EthNetwork_Holesky: "https://0x821f2a65afb70e7f2e820a925a9b4c80a159620582c1766b1b09729fec178b11ea22abb3a51f07b288be815a1a2ff516@bloxroute.holesky.blxrbdn.com",
+				config.EthNetwork_Hoodi:   "https://0x821f2a65afb70e7f2e820a925a9b4c80a159620582c1766b1b09729fec178b11ea22abb3a51f07b288be815a1a2ff516@bloxroute.hoodi.blxrbdn.com",
 			},
 		},
 
@@ -429,6 +431,7 @@ func createDefaultRelays() []MevRelay {
 			Description: "Titan Relay is a neutral, Rust-based MEV-Boost Relay optimized for low latency through put, geographical distribution, and robustness. This is the regulated (censoring) version.",
 			Urls: map[string]string{
 				config.EthNetwork_Mainnet: "https://0x8c4ed5e24fe5c6ae21018437bde147693f68cda427cd1122cf20819c30eda7ed74f72dece09bb313f2a1855595ab677d@regional.titanrelay.xyz",
+				config.EthNetwork_Hoodi:   "https://0xaa58208899c6105603b74396734a6263cc7d947f444f396a90f7b7d3e65d102aec7e5e5291b27e08d02c50a050825c2f@hoodi.titanrelay.xyz",
 			},
 		},
 	}
