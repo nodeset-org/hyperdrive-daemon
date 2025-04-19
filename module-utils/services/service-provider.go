@@ -171,9 +171,9 @@ func NewModuleServiceProvider[ConfigType hdconfig.IModuleConfig](hyperdriveUrl *
 	primaryBc := bclient.NewStandardHttpClient(primaryBnUrl, clientTimeout)
 	if fallbackBnUrl != "" {
 		fallbackBc := bclient.NewStandardHttpClient(fallbackBnUrl, clientTimeout)
-		bcManager = services.NewBeaconClientManagerWithFallback(primaryBc, fallbackBc, resources.ChainID, clientTimeout)
+		bcManager = services.NewBeaconClientManagerWithFallback(primaryBc, fallbackBc, resources.ChainID)
 	} else {
-		bcManager = services.NewBeaconClientManager(primaryBc, resources.ChainID, clientTimeout)
+		bcManager = services.NewBeaconClientManager(primaryBc, resources.ChainID)
 	}
 
 	// Get the module config
