@@ -8,7 +8,6 @@ import (
 	hdcommon "github.com/nodeset-org/hyperdrive-daemon/common"
 	"github.com/nodeset-org/hyperdrive-daemon/shared/types/api"
 	v2constellation "github.com/nodeset-org/nodeset-client-go/api-v2/constellation"
-	"github.com/nodeset-org/nodeset-client-go/common"
 	nscommon "github.com/nodeset-org/nodeset-client-go/common"
 
 	"github.com/rocket-pool/node-manager-core/api/server"
@@ -76,7 +75,7 @@ func (c *constellationUploadSignedExitsContext) PrepareData(data *api.NodeSetCon
 			data.IncorrectNodeAddress = true
 			return types.ResponseStatus_Success, nil
 		}
-		if errors.Is(err, common.ErrInvalidValidatorOwner) {
+		if errors.Is(err, nscommon.ErrInvalidValidatorOwner) {
 			data.InvalidValidatorOwner = true
 			return types.ResponseStatus_Success, nil
 		}
@@ -84,11 +83,11 @@ func (c *constellationUploadSignedExitsContext) PrepareData(data *api.NodeSetCon
 			data.ExitMessageAlreadyExists = true
 			return types.ResponseStatus_Success, nil
 		}
-		if errors.Is(err, common.ErrInvalidExitMessage) {
+		if errors.Is(err, nscommon.ErrInvalidExitMessage) {
 			data.InvalidExitMessage = true
 			return types.ResponseStatus_Success, nil
 		}
-		if errors.Is(err, common.ErrInvalidPermissions) {
+		if errors.Is(err, nscommon.ErrInvalidPermissions) {
 			data.InvalidPermissions = true
 			return types.ResponseStatus_Success, nil
 		}
