@@ -12,7 +12,6 @@ import (
 	"github.com/nodeset-org/hyperdrive-daemon/common"
 	"github.com/nodeset-org/hyperdrive-daemon/server"
 	"github.com/nodeset-org/hyperdrive-daemon/shared/auth"
-	"github.com/nodeset-org/hyperdrive-daemon/shared/config"
 	hdconfig "github.com/nodeset-org/hyperdrive-daemon/shared/config"
 )
 
@@ -51,7 +50,7 @@ func newHyperdriveNode(sp common.IHyperdriveServiceProvider, address string, cli
 	}
 
 	// Create the client
-	urlString := fmt.Sprintf("http://%s:%d/%s", address, serverMgr.GetPort(), config.HyperdriveApiClientRoute)
+	urlString := fmt.Sprintf("http://%s:%d/%s", address, serverMgr.GetPort(), hdconfig.HyperdriveApiClientRoute)
 	url, err := url.Parse(urlString)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing client URL [%s]: %v", urlString, err)
