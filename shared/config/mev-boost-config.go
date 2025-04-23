@@ -11,8 +11,8 @@ import (
 
 // Constants
 const (
-	mevBoostProdTag string = "flashbots/mev-boost:1.8.1"
-	mevBoostTestTag string = "flashbots/mev-boost:1.9rc3"
+	mevBoostProdTag string = "flashbots/mev-boost:1.9"
+	mevBoostTestTag string = "flashbots/mev-boost:1.9"
 )
 
 // A MEV relay
