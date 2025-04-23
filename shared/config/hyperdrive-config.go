@@ -149,7 +149,7 @@ func NewHyperdriveConfigForNetwork(hdDir string, networks []*HyperdriveSettings,
 			ParameterCommon: &config.ParameterCommon{
 				ID:                 ids.NetworkID,
 				Name:               "Network",
-				Description:        "The Ethereum network you want to use - select Hoodi Testnet or Holesky Testnet to practice with fake ETH, or Mainnet to stake on the real network using real ETH.",
+				Description:        "The Ethereum network you want to use - select Hoodi Testnet to practice with fake ETH, or Mainnet to stake on the real network using real ETH.",
 				AffectsContainers:  []config.ContainerID{config.ContainerID_Daemon, config.ContainerID_ExecutionClient, config.ContainerID_BeaconNode, config.ContainerID_ValidatorClient, config.ContainerID_MevBoost},
 				CanBeBlank:         false,
 				OverwriteOnUpgrade: false,
@@ -494,7 +494,7 @@ func getNetworkOptions(networks []*HyperdriveSettings) []*config.ParameterOption
 		})
 	}
 
-	// Sort the options so mainnet comes first, Hoodi comes second, and holesky comes third
+	// Sort the options so mainnet comes first and Hoodi comes second
 	sort.SliceStable(options, func(i, j int) bool {
 		firstOption := options[i]
 		secondOption := options[j]
@@ -512,14 +512,6 @@ func getNetworkOptions(networks []*HyperdriveSettings) []*config.ParameterOption
 			return true
 		}
 		if secondOption.Value == config.Network_Hoodi {
-			return false
-		}
-
-		// Holesky comes third
-		if firstOption.Value == config.Network_Holesky {
-			return true
-		}
-		if secondOption.Value == config.Network_Holesky {
 			return false
 		}
 
