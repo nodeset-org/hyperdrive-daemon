@@ -25,16 +25,6 @@ var (
 		NodeSetApiUrl: NodesetUrlProd,
 	}
 
-	// Holesky resources for reference in testing
-	HoleskyResourcesReference *HyperdriveResources = &HyperdriveResources{
-		NodeSetApiUrl: NodesetUrlProd,
-	}
-
-	// Holesky Devnet resources for reference in testing
-	HoleskyDevResourcesReference *HyperdriveResources = &HyperdriveResources{
-		NodeSetApiUrl: NodesetUrlStaging,
-	}
-
 	// Hoodi resources for reference in testing
 	HoodiResourcesReference *HyperdriveResources = &HyperdriveResources{
 		NodeSetApiUrl: NodesetUrlProd,
