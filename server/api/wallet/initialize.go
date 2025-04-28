@@ -58,6 +58,7 @@ type walletInitializeContext struct {
 
 func (c *walletInitializeContext) PrepareData(data *api.WalletInitializeData, opts *bind.TransactOpts) (types.ResponseStatus, error) {
 	sp := c.handler.serviceProvider
+	res := sp.GetResources()
 
 	// Parse the derivation path
 	path, err := wallet.GetDerivationPath(wallet.DerivationPath(c.derivationPath))
@@ -74,7 +75,7 @@ func (c *walletInitializeContext) PrepareData(data *api.WalletInitializeData, op
 			return types.ResponseStatus_Error, fmt.Errorf("error generating new mnemonic: %w", err)
 		}
 
-		w, err = nodewallet.TestRecovery(path, uint(c.index), mnemonic, 0)
+		w, err = nodewallet.TestRecovery(path, uint(c.index), mnemonic, res.ChainID)
 		if err != nil {
 			return types.ResponseStatus_Error, fmt.Errorf("error generating wallet from new mnemonic: %w", err)
 		}
