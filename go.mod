@@ -174,3 +174,5 @@ require (
 	lukechampine.com/blake3 v1.2.1 // indirect
 	rsc.io/tmplfunc v0.0.3 // indirect
 )
+
+replace github.com/rocket-pool/node-manager-core => github.com/nodeset-org/node-manager-core v0.5.2-0.20250517072521-25c73c4ebf98

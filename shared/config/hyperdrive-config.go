@@ -240,7 +240,7 @@ func NewHyperdriveConfigForNetwork(hdDir string, networks []*HyperdriveSettings,
 				OverwriteOnUpgrade: false,
 			},
 			Default: map[config.Network]float64{
-				config.Network_All: float64(20),
+				config.Network_All: float64(8),
 			},
 		},
 
