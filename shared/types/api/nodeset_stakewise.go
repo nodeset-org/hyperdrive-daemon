@@ -34,8 +34,9 @@ type NodeSetStakeWise_GetValidatorManagerSignatureRequestBody struct {
 }
 
 type NodeSetStakeWise_GetValidatorManagerSignatureData struct {
-	NotRegistered      bool   `json:"notRegistered"`
-	VaultNotFound      bool   `json:"vaultNotFound"`
-	InvalidPermissions bool   `json:"invalidPermissions"`
-	Signature          string `json:"signature"`
+	NotRegistered          bool   `json:"notRegistered"`
+	VaultNotFound          bool   `json:"vaultNotFound"`
+	InvalidPermissions     bool   `json:"invalidPermissions"`
+	DepositRootAlreadyUsed bool   `json:"depositRootAlreadyUsed"`
+	Signature              string `json:"signature"`
 }
