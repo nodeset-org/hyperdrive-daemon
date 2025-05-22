@@ -8,6 +8,7 @@ import (
 	hdcommon "github.com/nodeset-org/hyperdrive-daemon/common"
 	"github.com/nodeset-org/hyperdrive-daemon/shared/types/api"
 	apiv0 "github.com/nodeset-org/nodeset-client-go/api-v0"
+	v3stakewise "github.com/nodeset-org/nodeset-client-go/api-v3/stakewise"
 	"github.com/nodeset-org/nodeset-client-go/common/stakewise"
 
 	"github.com/rocket-pool/node-manager-core/api/server"
@@ -80,6 +81,10 @@ func (c *stakeWiseGetValidatorManagerSignatureContext) PrepareData(data *api.Nod
 		}
 		if errors.Is(err, stakewise.ErrInvalidPermissions) {
 			data.InvalidPermissions = true
+			return types.ResponseStatus_Success, nil
+		}
+		if errors.Is(err, v3stakewise.ErrDepositRootAlreadyAssigned) {
+			data.DepositRootAlreadyUsed = true
 			return types.ResponseStatus_Success, nil
 		}
 		return types.ResponseStatus_Error, err

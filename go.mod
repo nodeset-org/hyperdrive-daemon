@@ -5,6 +5,12 @@ go 1.24
 toolchain go1.24.2
 
 require (
+	github.com/rocket-pool/node-manager-core v0.5.2-0.20250430074613-76bcf6bb1be0
+)
+
+replace github.com/rocket-pool/node-manager-core => github.com/nodeset-org/node-manager-core v0.6.0
+
+require (
 	filippo.io/age v1.2.0
 	github.com/alessio/shellescape v1.4.2
 	github.com/docker/docker v27.3.1+incompatible
@@ -15,10 +21,9 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
 	github.com/hashicorp/go-version v1.6.0
-	github.com/nodeset-org/nodeset-client-go v1.3.0
+	github.com/nodeset-org/nodeset-client-go v1.3.1
 	github.com/nodeset-org/osha v0.4.0
 	github.com/rocket-pool/batch-query v1.0.0
-	github.com/rocket-pool/node-manager-core v0.5.2-0.20250430074613-76bcf6bb1be0
 	github.com/stretchr/testify v1.10.0
 	github.com/urfave/cli/v2 v2.27.5
 	github.com/wealdtech/go-ens/v3 v3.6.0
