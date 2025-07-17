@@ -26,18 +26,5 @@ const (
 	LocalBeaconID       string = "localBeacon"
 	ExternalBeaconID    string = "externalBeacon"
 	MetricsID           string = "metrics"
-	MevBoostID          string = "mevBoost"
-
-	// MEV-Boost
-	MevBoostEnableID             string = "enableMevBoost"
-	MevBoostModeID               string = "mode"
-	MevBoostSelectionModeID      string = "selectionMode"
-	MevBoostOpenRpcPortID        string = "openRpcPort"
-	MevBoostExternalUrlID        string = "externalUrl"
-	MevBoostFlashbotsID          string = "flashbotsEnabled"
-	MevBoostBloxRouteMaxProfitID string = "bloxRouteMaxProfitEnabled"
-	MevBoostBloxRouteRegulatedID string = "bloxRouteRegulatedEnabled"
-	MevBoostEdenID               string = "edenEnabled"
-	MevBoostTitanRegionalID      string = "titanRegionaEnabled"
-	MevBoostCustomRelaysID       string = "customRelays"
+	PbsID               string = "pbs"
 )

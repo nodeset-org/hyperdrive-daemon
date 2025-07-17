@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/nodeset-org/hyperdrive-daemon/shared"
+	"github.com/nodeset-org/hyperdrive-daemon/shared/config/pbs"
 	"github.com/rocket-pool/node-manager-core/config"
 )
 
@@ -385,15 +386,15 @@ func (cfg *HyperdriveConfig) GraffitiPrefix() string {
 
 // Used by text/template to format validator.yml
 func (cfg *HyperdriveConfig) MevBoostUrl() string {
-	if !cfg.MevBoost.Enable.Value {
+	if !cfg.Pbs.Enable.Value {
 		return ""
 	}
 
-	if cfg.MevBoost.Mode.Value == config.ClientMode_Local {
-		return fmt.Sprintf("http://%s:%d", config.ContainerID_MevBoost, cfg.MevBoost.Port.Value)
+	if cfg.Pbs.Mode.Value == config.ClientMode_Local {
+		return fmt.Sprintf("http://%s:%d", pbs.ContainerID_Pbs, cfg.Pbs.LocalPbsClientConfig.Port.Value)
 	}
 
-	return cfg.MevBoost.ExternalUrl.Value
+	return cfg.Pbs.ExternalPbsClientConfig.ExternalUrl.Value
 }
 
 // =================
@@ -407,10 +408,10 @@ func (cfg *HyperdriveConfig) GetMevBoostStartScript() string {
 
 // Used by text/template to format mev-boost.yml
 func (cfg *HyperdriveConfig) GetMevBoostOpenPorts() string {
-	portMode := cfg.MevBoost.OpenRpcPort.Value
+	portMode := cfg.Pbs.LocalPbsClientConfig.OpenRpcPort.Value
 	if !portMode.IsOpen() {
 		return ""
 	}
-	port := cfg.MevBoost.Port.Value
+	port := cfg.Pbs.LocalPbsClientConfig.Port.Value
 	return fmt.Sprintf("\"%s\"", portMode.DockerPortMapping(port))
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/nodeset-org/hyperdrive-daemon/shared"
 	"github.com/nodeset-org/hyperdrive-daemon/shared/config/ids"
 	"github.com/nodeset-org/hyperdrive-daemon/shared/config/migration"
+	"github.com/nodeset-org/hyperdrive-daemon/shared/config/pbs"
 	"github.com/rocket-pool/node-manager-core/config"
 	"github.com/rocket-pool/node-manager-core/log"
 	"gopkg.in/yaml.v3"
@@ -60,8 +61,8 @@ type HyperdriveConfig struct {
 	// Metrics
 	Metrics *config.MetricsConfig
 
-	// MEV-Boost
-	MevBoost *MevBoostConfig
+	// PBS
+	Pbs *pbs.PbsConfig
 
 	// Modules
 	Modules map[string]any
@@ -309,7 +310,7 @@ func NewHyperdriveConfigForNetwork(hdDir string, networks []*HyperdriveSettings,
 	cfg.ExternalBeaconClient = config.NewExternalBeaconConfig()
 	cfg.Fallback = config.NewFallbackConfig()
 	cfg.Metrics = NewMetricsConfig()
-	cfg.MevBoost = NewMevBoostConfig(cfg)
+	cfg.Pbs = pbs.NewPbsConfig()
 
 	// Provision the defaults for each network
 	for _, network := range networks {
@@ -359,7 +360,7 @@ func (cfg *HyperdriveConfig) GetSubconfigs() map[string]config.IConfigSection {
 		ids.LocalBeaconID:       cfg.LocalBeaconClient,
 		ids.ExternalBeaconID:    cfg.ExternalBeaconClient,
 		ids.MetricsID:           cfg.Metrics,
-		ids.MevBoostID:          cfg.MevBoost,
+		ids.PbsID:               cfg.Pbs,
 	}
 }
 
