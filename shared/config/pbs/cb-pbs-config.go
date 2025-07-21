@@ -11,23 +11,23 @@ const (
 	commitBoostPbsTestTag string = "ghcr.io/commit-boost/pbs:v0.8.0"
 )
 
-// Configuration for Commit Boost's PBS service
+// Configuration for Commit-Boost's PBS service
 type CommitBoostPbsConfig struct {
-	// The Docker Hub tag for MEV-Boost
+	// The Docker Hub tag for Commit-Boost PBS
 	ContainerTag config.Parameter[string]
 
 	// Custom command line flags
 	AdditionalFlags config.Parameter[string]
 }
 
-// Generates a new Commit Boost PBS service configuration
+// Generates a new Commit-Boost PBS service configuration
 func NewCommitBoostPbsConfig() *CommitBoostPbsConfig {
 	return &CommitBoostPbsConfig{
 		ContainerTag: config.Parameter[string]{
 			ParameterCommon: &config.ParameterCommon{
 				ID:                 nmc_ids.ContainerTagID,
 				Name:               "Container Tag",
-				Description:        "The tag name of the Commit Boost PBS container you want to use.",
+				Description:        "The tag name of the Commit-Boost PBS container you want to use.",
 				AffectsContainers:  []config.ContainerID{ContainerID_Pbs},
 				CanBeBlank:         false,
 				OverwriteOnUpgrade: true,
@@ -42,7 +42,7 @@ func NewCommitBoostPbsConfig() *CommitBoostPbsConfig {
 			ParameterCommon: &config.ParameterCommon{
 				ID:                 nmc_ids.AdditionalFlagsID,
 				Name:               "Additional Flags",
-				Description:        "Additional custom command line flags you want to pass to MEV-Boost, to take advantage of other settings that Hyperdrive's configuration doesn't cover.",
+				Description:        "Additional custom command line flags you want to pass to Commit-Boost PBS, to take advantage of other settings that Hyperdrive's configuration doesn't cover.",
 				AffectsContainers:  []config.ContainerID{ContainerID_Pbs},
 				CanBeBlank:         true,
 				OverwriteOnUpgrade: false,

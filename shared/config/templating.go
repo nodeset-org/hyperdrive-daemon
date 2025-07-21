@@ -38,8 +38,8 @@ func (c *HyperdriveConfig) PrometheusContainerName() string {
 	return string(config.ContainerID_Prometheus)
 }
 
-func (c *HyperdriveConfig) MevBoostContainerName() string {
-	return string(config.ContainerID_MevBoost)
+func (c *HyperdriveConfig) PbsClientContainerName() string {
+	return string(pbs.ContainerID_Pbs)
 }
 
 func (c *HyperdriveConfig) ExecutionClientDataVolume() string {

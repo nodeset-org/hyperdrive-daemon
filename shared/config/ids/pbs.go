@@ -14,6 +14,8 @@ const (
 	PbsBoostEdenID          string = "edenEnabled"
 	PbsTitanRegionalID      string = "titanRegionaEnabled"
 	PbsCustomRelaysID       string = "customRelays"
+	PbsLocalID              string = "localClient"
+	PbsExternalID           string = "externalClient"
 
 	// Commit-Boost PBS
 	CommitBoostPbsID string = "commitBoost"

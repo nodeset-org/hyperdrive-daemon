@@ -28,7 +28,7 @@ func NewPbsConfig() *PbsConfig {
 				ID:                 ids.PbsEnableID,
 				Name:               "Enable PBS Client",
 				Description:        "Enable support for a PBS client. When one of your validators needs to propose a Beacon chain block, this client lets other professional services build it for you instead of building your own. These block builders find and extract extra MEV opportunities, giving you a healthy tip in return (which tends to be worth more than blocks you built on your own).",
-				AffectsContainers:  []config.ContainerID{config.ContainerID_BeaconNode, config.ContainerID_MevBoost, config.ContainerID_ValidatorClient},
+				AffectsContainers:  []config.ContainerID{config.ContainerID_BeaconNode, ContainerID_Pbs, config.ContainerID_ValidatorClient},
 				CanBeBlank:         false,
 				OverwriteOnUpgrade: false,
 			},
@@ -42,7 +42,7 @@ func NewPbsConfig() *PbsConfig {
 				ID:                 ids.PbsModeID,
 				Name:               "PBS Client Mode",
 				Description:        "Choose whether to let Hyperdrive manage your PBS client (Locally Managed), or if you manage your own outside of Hyperdrive (Externally Managed).",
-				AffectsContainers:  []config.ContainerID{config.ContainerID_BeaconNode, config.ContainerID_MevBoost},
+				AffectsContainers:  []config.ContainerID{config.ContainerID_BeaconNode, ContainerID_Pbs},
 				CanBeBlank:         false,
 				OverwriteOnUpgrade: false,
 			},
@@ -85,7 +85,7 @@ func (cfg *PbsConfig) GetParameters() []config.IParameter {
 // Get the sections underneath this one
 func (cfg *PbsConfig) GetSubconfigs() map[string]config.IConfigSection {
 	return map[string]config.IConfigSection{
-		"Local PBS Service":    cfg.LocalPbsClientConfig,
-		"External PBS Service": cfg.ExternalPbsClientConfig,
+		ids.PbsLocalID:    cfg.LocalPbsClientConfig,
+		ids.PbsExternalID: cfg.ExternalPbsClientConfig,
 	}
 }

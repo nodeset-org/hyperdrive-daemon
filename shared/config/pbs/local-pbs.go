@@ -189,6 +189,7 @@ func (cfg *LocalPbsClientConfig) GetTitle() string {
 // Get the Parameters for this config
 func (cfg *LocalPbsClientConfig) GetParameters() []config.IParameter {
 	return []config.IParameter{
+		&cfg.Client,
 		&cfg.RelaySelectionMode,
 		&cfg.FlashbotsRelay,
 		&cfg.BloxRouteMaxProfitRelay,
