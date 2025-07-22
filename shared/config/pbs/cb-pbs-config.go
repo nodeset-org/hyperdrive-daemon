@@ -1,6 +1,8 @@
 package pbs
 
 import (
+	"fmt"
+
 	"github.com/rocket-pool/node-manager-core/config"
 	nmc_ids "github.com/rocket-pool/node-manager-core/config/ids"
 )
@@ -73,6 +75,21 @@ func (cfg *CommitBoostPbsConfig) GetSubconfigs() map[string]config.IConfigSectio
 	return map[string]config.IConfigSection{}
 }
 
+// Get the filename for the Commit-Boost PBS config
 func (cfg *CommitBoostPbsConfig) GetCommitBoostConfigFilename() string {
 	return CommitBoostConfigFile
+}
+
+// Get the chain name for the Commit-Boost config file
+func (cfg *CommitBoostPbsConfig) GetChainName(ethNetworkName string) (string, error) {
+	switch ethNetworkName {
+	case config.EthNetwork_Mainnet:
+		return "Mainnet", nil
+	case config.EthNetwork_Holesky:
+		return "Holesky", nil
+	case config.EthNetwork_Hoodi:
+		return "Hoodi", nil
+	default:
+		return "", fmt.Errorf("unsupported network %s for Commit-Boost PBS config", ethNetworkName)
+	}
 }
