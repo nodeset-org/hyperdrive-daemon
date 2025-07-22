@@ -378,3 +378,37 @@ func generateRelayParameter(id string, relay PbsRelay) config.Parameter[bool] {
 		},
 	}
 }
+
+// Get the container tag for the currently selected PBS client
+func (cfg *LocalPbsClientConfig) GetContainerTag() string {
+	switch cfg.Client.Value {
+	case PbsClient_CommitBoost:
+		return cfg.CommitBoostPbsConfig.ContainerTag.Value
+	case PbsClient_MevBoost:
+		return cfg.MevBoostConfig.ContainerTag.Value
+	default:
+		return ""
+	}
+}
+
+// Get the additional flags for the currently selected PBS client
+func (cfg *LocalPbsClientConfig) GetAdditionalFlags() string {
+	switch cfg.Client.Value {
+	case PbsClient_CommitBoost:
+		return cfg.CommitBoostPbsConfig.AdditionalFlags.Value
+	case PbsClient_MevBoost:
+		return cfg.MevBoostConfig.AdditionalFlags.Value
+	default:
+		return ""
+	}
+}
+
+// Used by text/template to format pbs.yml
+func (cfg *LocalPbsClientConfig) GetOpenPorts() string {
+	portMode := cfg.OpenRpcPort.Value
+	if !portMode.IsOpen() {
+		return ""
+	}
+	port := cfg.Port.Value
+	return fmt.Sprintf("\"%s\"", portMode.DockerPortMapping(port))
+}

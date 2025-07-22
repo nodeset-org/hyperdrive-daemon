@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"net/url"
+	"path/filepath"
 	"strings"
 
 	"github.com/nodeset-org/hyperdrive-daemon/shared"
@@ -385,7 +386,7 @@ func (cfg *HyperdriveConfig) GraffitiPrefix() string {
 }
 
 // Used by text/template to format validator.yml
-func (cfg *HyperdriveConfig) MevBoostUrl() string {
+func (cfg *HyperdriveConfig) PbsUrl() string {
 	if !cfg.Pbs.Enable.Value {
 		return ""
 	}
@@ -397,21 +398,16 @@ func (cfg *HyperdriveConfig) MevBoostUrl() string {
 	return cfg.Pbs.ExternalPbsClientConfig.ExternalUrl.Value
 }
 
-// =================
-// === MEV-Boost ===
-// =================
+// ===========
+// === PBS ===
+// ===========
 
-// Gets the name of the MEV-Boost start script
-func (cfg *HyperdriveConfig) GetMevBoostStartScript() string {
-	return MevBoostStartScript
+// Gets the name of the PBS start script
+func (cfg *HyperdriveConfig) GetPbsStartScript() string {
+	return PbsStartScript
 }
 
-// Used by text/template to format mev-boost.yml
-func (cfg *HyperdriveConfig) GetMevBoostOpenPorts() string {
-	portMode := cfg.Pbs.LocalPbsClientConfig.OpenRpcPort.Value
-	if !portMode.IsOpen() {
-		return ""
-	}
-	port := cfg.Pbs.LocalPbsClientConfig.Port.Value
-	return fmt.Sprintf("\"%s\"", portMode.DockerPortMapping(port))
+// Get the path within the user dir that stores PBS config data
+func (cfg *HyperdriveConfig) GetPbsConfigPath() string {
+	return filepath.Join(cfg.GetUserDirectory(), PbsDir)
 }

@@ -7,6 +7,7 @@ import (
 
 // Constants
 const (
+	CommitBoostConfigFile string = "cb_config.toml"
 	commitBoostPbsProdTag string = "ghcr.io/commit-boost/pbs:v0.8.0"
 	commitBoostPbsTestTag string = "ghcr.io/commit-boost/pbs:v0.8.0"
 )
@@ -70,4 +71,8 @@ func (cfg *CommitBoostPbsConfig) GetParameters() []config.IParameter {
 // Get the sections underneath this one
 func (cfg *CommitBoostPbsConfig) GetSubconfigs() map[string]config.IConfigSection {
 	return map[string]config.IConfigSection{}
+}
+
+func (cfg *CommitBoostPbsConfig) GetCommitBoostConfigFilename() string {
+	return CommitBoostConfigFile
 }
