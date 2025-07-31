@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"sort"
+	"strings"
 
 	"github.com/alessio/shellescape"
 	"github.com/nodeset-org/hyperdrive-daemon/shared"
@@ -566,22 +567,22 @@ func (cfg *HyperdriveConfig) GetPasswordFilePath() string {
 	return filepath.Join(cfg.UserDataPath.Value, UserPasswordFilename)
 }
 
-func (cfg *HyperdriveConfig) GetExecutionClientUrls() (string, string) {
+func (cfg *HyperdriveConfig) GetExecutionClientUrls() (string, []string) {
 	primaryEcUrl := cfg.GetEcHttpEndpoint()
-	var fallbackEcUrl string
+	var fallbackEcUrls []string
 	if cfg.Fallback.UseFallbackClients.Value {
-		fallbackEcUrl = cfg.Fallback.EcHttpUrl.Value
+		fallbackEcUrls = strings.Split(cfg.Fallback.EcHttpUrls.Value, ",")
 	}
-	return primaryEcUrl, fallbackEcUrl
+	return primaryEcUrl, fallbackEcUrls
 }
 
-func (cfg *HyperdriveConfig) GetBeaconNodeUrls() (string, string) {
+func (cfg *HyperdriveConfig) GetBeaconNodeUrls() (string, []string) {
 	primaryBnUrl := cfg.GetBnHttpEndpoint()
-	var fallbackBnUrl string
+	var fallbackBnUrls []string
 	if cfg.Fallback.UseFallbackClients.Value {
-		fallbackBnUrl = cfg.Fallback.BnHttpUrl.Value
+		fallbackBnUrls = strings.Split(cfg.Fallback.BnHttpUrls.Value, ",")
 	}
-	return primaryBnUrl, fallbackBnUrl
+	return primaryBnUrl, fallbackBnUrls
 }
 
 func (cfg *HyperdriveConfig) GetLoggerOptions() log.LoggerOptions {

@@ -124,18 +124,18 @@ func (cfg *HyperdriveConfig) BnRpcUrl() (string, error) {
 	return cfg.ExternalBeaconClient.PrysmRpcUrl.Value, nil
 }
 
-func (cfg *HyperdriveConfig) FallbackBnHttpUrl() string {
+func (cfg *HyperdriveConfig) FallbackBnHttpUrls() []string {
 	if !cfg.Fallback.UseFallbackClients.Value {
-		return ""
+		return []string{}
 	}
-	return cfg.Fallback.BnHttpUrl.Value
+	return strings.Split(cfg.Fallback.BnHttpUrls.Value, ",")
 }
 
-func (cfg *HyperdriveConfig) FallbackBnRpcUrl() string {
+func (cfg *HyperdriveConfig) FallbackBnRpcUrls() []string {
 	if !cfg.Fallback.UseFallbackClients.Value {
-		return ""
+		return []string{}
 	}
-	return cfg.Fallback.PrysmRpcUrl.Value
+	return strings.Split(cfg.Fallback.PrysmRpcUrls.Value, ",")
 }
 
 func (cfg *HyperdriveConfig) AutoTxMaxFeeInt() uint64 {
@@ -216,12 +216,12 @@ func (cfg *HyperdriveConfig) GetEcHttpEndpoint() string {
 	return cfg.ExternalExecutionClient.HttpUrl.Value
 }
 
-// Get the endpoints of the EC, including the fallback if applicable
-func (cfg *HyperdriveConfig) GetEcHttpEndpointsWithFallback() string {
+// Get the endpoints of the EC, including the fallbacks if applicable
+func (cfg *HyperdriveConfig) GetEcHttpEndpointsWithFallbacks() string {
 	endpoints := cfg.GetEcHttpEndpoint()
 
 	if cfg.Fallback.UseFallbackClients.Value {
-		endpoints = fmt.Sprintf("%s,%s", endpoints, cfg.Fallback.EcHttpUrl.Value)
+		endpoints = fmt.Sprintf("%s,%s", endpoints, cfg.Fallback.EcHttpUrls.Value)
 	}
 	return endpoints
 }
@@ -287,12 +287,12 @@ func (cfg *HyperdriveConfig) GetBnHttpEndpoint() string {
 	return cfg.ExternalBeaconClient.HttpUrl.Value
 }
 
-// Get the endpoints of the BN, including the fallback if applicable
+// Get the endpoints of the BN, including the fallbacks if applicable
 func (cfg *HyperdriveConfig) GetBnHttpEndpointsWithFallback() string {
 	endpoints := cfg.GetBnHttpEndpoint()
 
 	if cfg.Fallback.UseFallbackClients.Value {
-		endpoints = fmt.Sprintf("%s,%s", endpoints, cfg.Fallback.BnHttpUrl.Value)
+		endpoints = fmt.Sprintf("%s,%s", endpoints, cfg.Fallback.BnHttpUrls.Value)
 	}
 	return endpoints
 }
