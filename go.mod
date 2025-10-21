@@ -6,7 +6,7 @@ toolchain go1.24.2
 
 require github.com/rocket-pool/node-manager-core v0.5.2-0.20250430074613-76bcf6bb1be0
 
-replace github.com/rocket-pool/node-manager-core => github.com/nodeset-org/node-manager-core v0.6.1-0.20251020134607-548fce73442e
+replace github.com/rocket-pool/node-manager-core => github.com/nodeset-org/node-manager-core v0.7.0
 
 require (
 	filippo.io/age v1.2.0
