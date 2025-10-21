@@ -14,10 +14,10 @@ const (
 	UserPasswordFilename   string = "password"
 
 	// Scripts
-	EcStartScript       string = "start-ec.sh"
-	BnStartScript       string = "start-bn.sh"
-	VcStartScript       string = "start-vc.sh"
-	MevBoostStartScript string = "start-mev-boost.sh"
+	EcStartScript  string = "start-ec.sh"
+	BnStartScript  string = "start-bn.sh"
+	VcStartScript  string = "start-vc.sh"
+	PbsStartScript string = "start-pbs.sh"
 
 	// Volumes
 	ExecutionClientDataVolume string = "ecdata"
@@ -31,4 +31,7 @@ const (
 	// API Keys
 	SecretsDir        string = "secrets"
 	DaemonKeyFilename string = "daemon.key"
+
+	// PBS
+	PbsDir string = "pbs"
 )

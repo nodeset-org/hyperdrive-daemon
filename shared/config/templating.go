@@ -3,9 +3,11 @@ package config
 import (
 	"fmt"
 	"net/url"
+	"path/filepath"
 	"strings"
 
 	"github.com/nodeset-org/hyperdrive-daemon/shared"
+	"github.com/nodeset-org/hyperdrive-daemon/shared/config/pbs"
 	"github.com/rocket-pool/node-manager-core/config"
 )
 
@@ -37,8 +39,8 @@ func (c *HyperdriveConfig) PrometheusContainerName() string {
 	return string(config.ContainerID_Prometheus)
 }
 
-func (c *HyperdriveConfig) MevBoostContainerName() string {
-	return string(config.ContainerID_MevBoost)
+func (c *HyperdriveConfig) PbsClientContainerName() string {
+	return string(pbs.ContainerID_Pbs)
 }
 
 func (c *HyperdriveConfig) ExecutionClientDataVolume() string {
@@ -384,33 +386,28 @@ func (cfg *HyperdriveConfig) GraffitiPrefix() string {
 }
 
 // Used by text/template to format validator.yml
-func (cfg *HyperdriveConfig) MevBoostUrl() string {
-	if !cfg.MevBoost.Enable.Value {
+func (cfg *HyperdriveConfig) PbsUrl() string {
+	if !cfg.Pbs.Enable.Value {
 		return ""
 	}
 
-	if cfg.MevBoost.Mode.Value == config.ClientMode_Local {
-		return fmt.Sprintf("http://%s:%d", config.ContainerID_MevBoost, cfg.MevBoost.Port.Value)
+	if cfg.Pbs.Mode.Value == config.ClientMode_Local {
+		return fmt.Sprintf("http://%s:%d", pbs.ContainerID_Pbs, cfg.Pbs.LocalPbsClientConfig.Port.Value)
 	}
 
-	return cfg.MevBoost.ExternalUrl.Value
+	return cfg.Pbs.ExternalPbsClientConfig.ExternalUrl.Value
 }
 
-// =================
-// === MEV-Boost ===
-// =================
+// ===========
+// === PBS ===
+// ===========
 
-// Gets the name of the MEV-Boost start script
-func (cfg *HyperdriveConfig) GetMevBoostStartScript() string {
-	return MevBoostStartScript
+// Gets the name of the PBS start script
+func (cfg *HyperdriveConfig) GetPbsStartScript() string {
+	return PbsStartScript
 }
 
-// Used by text/template to format mev-boost.yml
-func (cfg *HyperdriveConfig) GetMevBoostOpenPorts() string {
-	portMode := cfg.MevBoost.OpenRpcPort.Value
-	if !portMode.IsOpen() {
-		return ""
-	}
-	port := cfg.MevBoost.Port.Value
-	return fmt.Sprintf("\"%s\"", portMode.DockerPortMapping(port))
+// Get the path within the user dir that stores PBS config data
+func (cfg *HyperdriveConfig) GetPbsConfigPath() string {
+	return filepath.Join(cfg.GetUserDirectory(), PbsDir)
 }
