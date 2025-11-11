@@ -10,8 +10,8 @@ import (
 // Constants
 const (
 	CommitBoostConfigFile string = "cb_config.toml"
-	commitBoostPbsProdTag string = "ghcr.io/commit-boost/pbs:v0.8.0"
-	commitBoostPbsTestTag string = "ghcr.io/commit-boost/pbs:v0.8.1-rc.4"
+	commitBoostPbsProdTag string = "ghcr.io/commit-boost/pbs:v0.9.2"
+	commitBoostPbsTestTag string = "ghcr.io/commit-boost/pbs:v0.9.2"
 )
 
 // Configuration for Commit-Boost's PBS service
